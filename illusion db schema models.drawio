@@ -18,7 +18,7 @@
         </mxCell>
         <object label="lesson " id="rcdddzgoVTeUVf7209Ef-19">
           <mxCell style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-            <mxGeometry x="60" y="350" width="180" height="180" as="geometry" />
+            <mxGeometry x="290" y="440" width="180" height="180" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="rcdddzgoVTeUVf7209Ef-20" value="+lesson_id&amp;nbsp; int (PK)&lt;br&gt;+course_id&amp;nbsp; int&lt;br&gt;&lt;div&gt;+instructor_id int&lt;/div&gt;&lt;div&gt;+lesson_content text&lt;/div&gt;&lt;div&gt;+order int&lt;br&gt;&lt;/div&gt;&lt;div&gt;+created_timestamp&lt;/div&gt;&lt;div&gt;+updated_timestamp&lt;/div&gt;&lt;div&gt;+is_published boolean &lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-19">
@@ -26,10 +26,34 @@
         </mxCell>
         <object label="section" id="rcdddzgoVTeUVf7209Ef-21">
           <mxCell style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-            <mxGeometry x="340" y="370" width="180" height="130" as="geometry" />
+            <mxGeometry x="60" y="790" width="180" height="130" as="geometry" />
           </mxCell>
         </object>
         <mxCell id="rcdddzgoVTeUVf7209Ef-22" value="+section_id&amp;nbsp; int (PK)&lt;br&gt;+lesson_id&amp;nbsp; int (FK)&lt;br&gt;&lt;div&gt;+title varchar&lt;br&gt;&lt;/div&gt;&lt;div&gt;+content text&lt;/div&gt;&lt;div&gt;+order&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-21">
+          <mxGeometry y="50" width="180" height="80" as="geometry" />
+        </mxCell>
+        <object label="instructors" id="rcdddzgoVTeUVf7209Ef-23">
+          <mxCell style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+            <mxGeometry x="530" y="400" width="180" height="130" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-24" value="+instructor_id int (PK)&lt;br&gt;+user_reg_id&lt;br&gt;&lt;div&gt;+contact_address&lt;br&gt;&lt;/div&gt;&lt;div&gt;+call_no&lt;br&gt;&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-23">
+          <mxGeometry y="50" width="180" height="80" as="geometry" />
+        </mxCell>
+        <object label="course_type" id="rcdddzgoVTeUVf7209Ef-25">
+          <mxCell style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+            <mxGeometry x="380" y="260" width="170" height="90" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-26" value="+course_type_id&amp;nbsp; int (PK)&lt;br&gt;+course_type&amp;nbsp; varchar &lt;br&gt;&lt;br&gt;&lt;div&gt;&amp;nbsp;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-25">
+          <mxGeometry y="50" width="170" height="40" as="geometry" />
+        </mxCell>
+        <object label="courses" id="rcdddzgoVTeUVf7209Ef-27">
+          <mxCell style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+            <mxGeometry x="80" y="320" width="180" height="130" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-28" value="+course_id&amp;nbsp; int (PK)&lt;br&gt;+course_type_id&amp;nbsp; int (FK)&lt;br&gt;&lt;div&gt;+course_title varchar&lt;br&gt;&lt;/div&gt;&lt;div&gt;+description&lt;br&gt;&lt;/div&gt;&lt;div&gt;+order&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-27">
           <mxGeometry y="50" width="180" height="80" as="geometry" />
         </mxCell>
       </root>
