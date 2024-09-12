@@ -56,6 +56,14 @@
         <mxCell id="rcdddzgoVTeUVf7209Ef-28" value="+course_id&amp;nbsp; int (PK)&lt;br&gt;+course_type_id&amp;nbsp; int (FK)&lt;br&gt;&lt;div&gt;+course_title varchar&lt;br&gt;&lt;/div&gt;&lt;div&gt;+description&lt;br&gt;&lt;/div&gt;&lt;div&gt;+order&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-27">
           <mxGeometry y="50" width="180" height="80" as="geometry" />
         </mxCell>
+        <object label="resources" id="rcdddzgoVTeUVf7209Ef-29">
+          <mxCell style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+            <mxGeometry x="70" y="520" width="180" height="120" as="geometry" />
+          </mxCell>
+        </object>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-30" value="+resource_id&amp;nbsp; int (PK)&lt;br&gt;+lesson_id&amp;nbsp; int (FK)&lt;br&gt;&lt;div&gt;+resource_title varchar&lt;br&gt;&lt;/div&gt;&lt;div&gt;+resource_link text&lt;/div&gt;&lt;div&gt;&amp;nbsp;&lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-29">
+          <mxGeometry y="50" width="180" height="70" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
