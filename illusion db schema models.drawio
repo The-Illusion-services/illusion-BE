@@ -1,9 +1,21 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0" version="24.7.13">
   <diagram name="Page-1" id="WIzkgsFBizQJKrMtI0oR">
-    <mxGraphModel>
+    <mxGraphModel dx="1434" dy="795" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="rcdddzgoVTeUVf7209Ef-13" value="user_login_details" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="30" y="40" width="160" height="170" as="geometry" />
+        </mxCell>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-14" value="+user_login_detail_id (PK)&lt;br&gt;+username&lt;br&gt;&lt;div&gt;+pw&lt;/div&gt;&lt;div&gt;+user_registration_id&lt;/div&gt;&lt;div&gt;+last_login_timestamp&lt;/div&gt;&lt;div&gt;+last_logout_timestamp&lt;/div&gt;&lt;div&gt;+login_ip&lt;/div&gt;&lt;div&gt;+user_status&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-13">
+          <mxGeometry y="50" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-17" value="user_registration" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="240" y="40" width="160" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="rcdddzgoVTeUVf7209Ef-18" value="+user_registration_id(PK) &lt;br&gt;+last_name&lt;br&gt;&lt;div&gt;+first_anme&lt;br&gt;&lt;/div&gt;&lt;div&gt;+field_id&lt;/div&gt;&lt;div&gt;+user_category_id&lt;/div&gt;&lt;div&gt;+email&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="rcdddzgoVTeUVf7209Ef-17">
+          <mxGeometry y="50" width="160" height="100" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
