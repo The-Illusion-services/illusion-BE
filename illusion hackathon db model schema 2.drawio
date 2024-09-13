@@ -4,6 +4,9 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--14" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="QAZkDA_mCbFP6sMs8N5--1" target="QAZkDA_mCbFP6sMs8N5--6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--1" value="quiz" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
           <mxGeometry x="380" y="150" width="190" height="190" as="geometry" />
         </mxCell>
@@ -17,16 +20,43 @@
           <mxGeometry y="50" width="160" height="70" as="geometry" />
         </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--5" value="questions" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="140" y="130" width="160" height="130" as="geometry" />
+          <mxGeometry x="620" y="360" width="160" height="130" as="geometry" />
         </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--6" value="+question_id int (PK)&lt;br&gt;+question_type_id int (FK)&lt;br&gt;&lt;div&gt;+quiz_id int (FK)&lt;/div&gt;&lt;div&gt;+content text&lt;/div&gt;&lt;div&gt;+points int &lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="QAZkDA_mCbFP6sMs8N5--5">
           <mxGeometry y="50" width="160" height="80" as="geometry" />
         </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--7" value="user_answers" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="180" y="360" width="160" height="120" as="geometry" />
+          <mxGeometry x="180" y="410" width="160" height="120" as="geometry" />
         </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--8" value="+user_answer_id int (PK)&lt;br&gt;+question_id int (FK)&lt;br&gt;&lt;div&gt;+answer string&lt;/div&gt;&lt;div&gt;+is_correct boolean&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="QAZkDA_mCbFP6sMs8N5--7">
           <mxGeometry y="50" width="160" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--9" value="illusion Quiz Entity ER Daiagram" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=21;" vertex="1" parent="1">
+          <mxGeometry x="230" y="10" width="420" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="QAZkDA_mCbFP6sMs8N5--4" target="QAZkDA_mCbFP6sMs8N5--5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--11" value="1,1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="670" y="270" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--12" value="1,1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="684" y="340" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--15" value="1,1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="426" y="128" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--18" value="1,n" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="544" y="450" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--19" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="QAZkDA_mCbFP6sMs8N5--2" target="QAZkDA_mCbFP6sMs8N5--7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--20" value="1,1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="330" y="240" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--21" value="1,n" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="346" y="450" width="60" height="30" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
