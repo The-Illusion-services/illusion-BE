@@ -22,6 +22,12 @@
         <mxCell id="QAZkDA_mCbFP6sMs8N5--6" value="+question_id int (PK)&lt;br&gt;+question_type_id int (FK)&lt;br&gt;&lt;div&gt;+quiz_id int (FK)&lt;/div&gt;&lt;div&gt;+content text&lt;/div&gt;&lt;div&gt;+points int &lt;br&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="QAZkDA_mCbFP6sMs8N5--5">
           <mxGeometry y="50" width="160" height="80" as="geometry" />
         </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--7" value="user_answers" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="360" width="160" height="120" as="geometry" />
+        </mxCell>
+        <mxCell id="QAZkDA_mCbFP6sMs8N5--8" value="+user_answer_id int (PK)&lt;br&gt;+question_id int (FK)&lt;br&gt;&lt;div&gt;+answer string&lt;/div&gt;&lt;div&gt;+is_correct boolean&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="QAZkDA_mCbFP6sMs8N5--7">
+          <mxGeometry y="50" width="160" height="70" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
