@@ -1,14 +1,11 @@
 <mxfile host="app.diagrams.net" agent="Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:130.0) Gecko/20100101 Firefox/130.0" version="24.7.13">
   <diagram name="Page-1" id="WIzkgsFBizQJKrMtI0oR">
-    <mxGraphModel dx="2045" dy="805" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1645" dy="805" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1654" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="rcdddzgoVTeUVf7209Ef-74" value="LESSON AND LOGIN DETAILS ER ENTITIES DIAGRAM" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=18;" parent="1" vertex="1">
-          <mxGeometry x="100" y="70" width="542" height="30" as="geometry" />
-        </mxCell>
-        <mxCell id="15M1-edb_IW5XRDmWn_Y-6" value="illusion Quiz Entity ER Daiagram" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=21;" vertex="1" parent="1">
-          <mxGeometry x="1050" y="30" width="420" height="30" as="geometry" />
+        <mxCell id="rcdddzgoVTeUVf7209Ef-74" value="ILLUSION HACKATHON ENTITIES DIAGRAM" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=37;" parent="1" vertex="1">
+          <mxGeometry x="309" y="20" width="941" height="40" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-51" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.25;entryDx=0;entryDy=0;" edge="1" parent="1" source="15M1-edb_IW5XRDmWn_Y-7" target="rcdddzgoVTeUVf7209Ef-18">
           <mxGeometry relative="1" as="geometry" />
@@ -50,7 +47,7 @@
           <mxGeometry y="50" width="190" height="130" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-19" value="setting_category" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="640" width="160" height="120" as="geometry" />
+          <mxGeometry x="1460" y="535" width="160" height="120" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-20" value="+setting_category_id int (PK)&lt;br&gt;+name string&lt;br&gt;+description text" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="15M1-edb_IW5XRDmWn_Y-19">
           <mxGeometry y="50" width="160" height="70" as="geometry" />
@@ -110,13 +107,13 @@
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-38" value="setting" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1400" y="810" width="160" height="150" as="geometry" />
+          <mxGeometry x="1410" y="757" width="160" height="150" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-39" value="+setting_id int (PK)&lt;br&gt;+setting_category_id int (FK)&lt;br&gt;&lt;div&gt;+name string &lt;br&gt;&lt;/div&gt;&lt;div&gt;+description text&lt;br&gt;&lt;/div&gt;&lt;div&gt;+data_type string&lt;br&gt;&lt;/div&gt;&lt;div&gt;+default_value string&lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="15M1-edb_IW5XRDmWn_Y-38">
           <mxGeometry y="50" width="160" height="100" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-40" value="user_setting" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="1155" y="640" width="160" height="120" as="geometry" />
+          <mxGeometry x="1230" y="520" width="160" height="120" as="geometry" />
         </mxCell>
         <mxCell id="15M1-edb_IW5XRDmWn_Y-41" value="+user_setting_id&lt;br&gt;+reg_user_id&lt;br&gt;+setting_id" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="15M1-edb_IW5XRDmWn_Y-40">
           <mxGeometry y="50" width="160" height="70" as="geometry" />
@@ -303,11 +300,12 @@
           <mxGeometry relative="1" as="geometry">
             <mxPoint x="810" y="450" as="sourcePoint" />
             <Array as="points">
-              <mxPoint x="797" y="450" />
-              <mxPoint x="810" y="450" />
+              <mxPoint x="810" y="452" />
               <mxPoint x="810" y="560" />
               <mxPoint x="1110" y="560" />
-              <mxPoint x="1110" y="707" />
+              <mxPoint x="1110" y="580" />
+              <mxPoint x="1210" y="580" />
+              <mxPoint x="1210" y="588" />
             </Array>
           </mxGeometry>
         </mxCell>
