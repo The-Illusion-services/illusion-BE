@@ -113,7 +113,7 @@
           <mxGeometry y="50" width="160" height="70" as="geometry" />
         </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--51" value="system_setting" style="swimlane;childLayout=stackLayout;horizontal=1;startSize=50;horizontalStack=0;rounded=1;fontSize=14;fontStyle=0;strokeWidth=2;resizeParent=0;resizeLast=1;shadow=0;dashed=0;align=center;arcSize=4;whiteSpace=wrap;html=1;" vertex="1" parent="1">
-          <mxGeometry x="240" y="890" width="160" height="120" as="geometry" />
+          <mxGeometry x="360" y="850" width="160" height="120" as="geometry" />
         </mxCell>
         <mxCell id="QAZkDA_mCbFP6sMs8N5--52" value="+system_setting_id int (PK)&lt;br&gt;+setting_id int (FK)&lt;br&gt;&lt;div&gt;+last_updated_by_user_id&lt;/div&gt;&lt;div&gt;+last_updated_timestamp &lt;br&gt;&lt;/div&gt;" style="align=left;strokeColor=none;fillColor=none;spacingLeft=4;fontSize=12;verticalAlign=top;resizable=0;rotatable=0;part=1;html=1;" vertex="1" parent="QAZkDA_mCbFP6sMs8N5--51">
           <mxGeometry y="50" width="160" height="70" as="geometry" />
