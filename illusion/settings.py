@@ -9,8 +9,12 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+from os import getenv
+#from dotenv import load_dotenv
+#load_dotenv()
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'illusion.apps.IllusionConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -73,11 +78,21 @@ WSGI_APPLICATION = 'illusion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Add these at the top of your settings.py
+
+# Replace the DATABASES section of your settings.py with this
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': 'illusion_services',
+    'USER': 'illusion_services_owner',
+    'PASSWORD': '36GqeYbTVIAZ',
+    'HOST': 'ep-curly-poetry-a56xehjr.us-east-2.aws.neon.tech',
+    'PORT': '5432',
+    'OPTIONS': {
+      'sslmode': 'require',
+    },
+  }
 }
 
 
