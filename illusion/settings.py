@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,21 +26,54 @@ SECRET_KEY = 'django-insecure-(jqbx_r&i@nv7wizsn!a-0av@q*aco@zc@2%*gfi_&74+l)2d8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
-
+SITE_ID = 1
 # Application definition
 
 INSTALLED_APPS = [
+    # Django's default apps
+    # 'django.contrib.sites',  # Required for django-allauth
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # app handling the google auth
+    'rest_framework',
+    'rest_framework_simplejwt',     
+
+    # django app
     'accounts',
 ]
 
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+}
+
+
+# SOCIALACCOUNT_PROVIDERS = {
+#     'google': {
+#         # For each OAuth based provider, either add a `SocialApp`
+#         # (`socialaccount` app) containing the required client
+#         # credentials, or list them here:
+#         'APP': {
+#             'client_id': '',
+#             'secret': '',
+#             'key': ''
+#         }
+#     },
+# }
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -48,6 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'allauth.account.middleware.AccountMiddleware'
 ]
 
 ROOT_URLCONF = 'illusion.urls'
@@ -63,6 +98,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                    # allauth needs a context_processors for django 
             ],
         },
     },
@@ -125,3 +161,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 AUTH_USER_MODEL = 'accounts.User'
+
+
+AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',  # Default
+    # 'allauth.account.auth_backends.AuthenticationBackend',  # For social auth
+)
