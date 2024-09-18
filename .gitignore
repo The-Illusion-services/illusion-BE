@@ -4,4 +4,6 @@ __pycache__/
 
 .vscode
 .env
-illusion/settings.py
+
+migrations
+
