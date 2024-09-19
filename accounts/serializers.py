@@ -22,3 +22,28 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         instance.save()
         return instance
+
+
+class GoogleSignUpSerializer(serializers.Serializer):
+    token = serializers.CharField()
+
+    def validate_token(self, token):
+        from .google import verify_google_token
+        user_info = verify_google_token(token)
+        if not user_info:
+            raise serializers.ValidationError("Invalid or expired token")
+        return user_info
+
+    def create(self, validated_data):
+        user_info = validated_data['token']
+        email = user_info['email']
+        name = user_info['name']
+
+        user, created = User.objects.get_or_create(
+            email=email,
+            defaults={"username": email.split('@')[0], "first_name": name}
+        )
+
+        return user
+
+
