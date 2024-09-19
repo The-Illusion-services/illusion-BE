@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from .models import *
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
-from .serializer import UserSerializer
+from .serializers import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
@@ -18,6 +18,8 @@ import datetime
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model, authenticate, login
+
+
 
 
 class UserRegistrationView(APIView):
@@ -89,3 +91,27 @@ class LoginAPIView(APIView):
         
 
         return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+class GoogleSignUpView(APIView):
+    def post(self, request):
+        serializer = GoogleSignUpSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = serializer.save()
+
+        # Generate JWT token
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
+
+
+
+class ProtectedView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({"message": "You are authenticated"}, status=200)
