@@ -9,9 +9,17 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import os
 from pathlib import Path
+
+from os import getenv
+from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv()
+
+
 from datetime import timedelta
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -46,6 +54,9 @@ INSTALLED_APPS = [
 
     # django app
     'accounts',
+    'courses',
+    'setting',
+    'quizzes'
 ]
 
 
@@ -110,11 +121,21 @@ WSGI_APPLICATION = 'illusion.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# Add these at the top of your settings.py
+
+# Replace the DATABASES section of your settings.py with this
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+  'default': {
+    'ENGINE': 'django.db.backends.postgresql',
+    'NAME': getenv('PGDATABASE'),
+    'USER': getenv('PGUSER'),
+    'PASSWORD': getenv('PGPASSWORD'),
+    'HOST': getenv('PGHOST'),
+    'PORT': '5432',
+    'OPTIONS': {
+      'sslmode': 'require',
+    },
+  }
 }
 
 

@@ -1,3 +1,6 @@
+
+my_env/
+
 # Python files
 *.pyc
 *.pyo
@@ -18,6 +21,7 @@ venv/
 env/
 ENV/
 .venv/
+
 
 # IDE and Editor files
 .vscode/
@@ -87,6 +91,13 @@ celerybeat-schedule
 # dotenv
 .env
 
+
+.vscode
+.env
+
+migrations
+
+
 # MySQL
 *.pem
 
@@ -95,3 +106,4 @@ celerybeat-schedule
 
 # Windows
 Thumb
+
