@@ -112,6 +112,10 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
         fields = '__all__'
 
+class EnrollmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Enrollment
+        fields = '__all__'
 
 
 
@@ -120,3 +124,47 @@ class AssignmentSerializer(serializers.ModelSerializer):
         model = Assignment
         fields = '__all__'
         read_only_fields = ['created_by', 'created_at', 'updated_at']
+
+
+
+class AssignmentSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AssignmentSubmission
+        fields = '__all__'
+
+
+class LessonProgressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LessonProgressTracker
+        fields = '__all__'
+
+
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ['id', 'answer_text', 'is_correct']
+
+class QuestionSerializer(serializers.ModelSerializer):
+    answers = AnswerSerializer(many=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'question_text', 'answers']
+
+class QuizSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True)
+
+    class Meta:
+        model = Quiz
+        fields = ['id', 'title', 'questions', 'created_by', 'created_at']
+
+class QuizSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizSubmission
+        fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
+
+
+class ResourceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Resource
+        fields = ['id', 'lesson', 'module', 'resource_title', 'resource_link']
