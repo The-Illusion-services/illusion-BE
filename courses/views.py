@@ -3,8 +3,8 @@ from rest_framework.exceptions import PermissionDenied
 # Create your views here.
 from rest_framework import generics
 from serializers.serializers import *
-from permissions.permissions import IsEmployer 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
+from permissions.permissions import IsEmployee, IsEmployer 
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 
 
 
@@ -63,9 +63,13 @@ class ModuleUpdateView(generics.UpdateAPIView):
         serializer.save()
 
 class ModuleListView(generics.ListAPIView):
-    queryset = Module.objects.all()
     serializer_class = ModuleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        course_id = self.kwargs.get('course_id')
+        return Module.objects.filter(course_id=course_id)
+
 
 
 
@@ -101,7 +105,7 @@ class AssignmentCreateView(generics.CreateAPIView):
 class AssignmentUpdateView(generics.UpdateAPIView):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployer]
 
     def perform_update(self, serializer):
         assignment = self.get_object()
@@ -122,3 +126,122 @@ class AssignmentListView(generics.ListAPIView):
         # Filter assignments by the course ID passed in the URL
         course_id = self.kwargs.get('course_id')
         return Assignment.objects.filter(course_id=course_id)
+
+
+
+class EnrollCourseView(generics.CreateAPIView):
+    queryset = Enrollment.objects.all()
+    serializer_class = EnrollmentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployee]
+
+    def perform_create(self, serializer):
+        course = get_object_or_404(Course, id=self.request.data.get('course'))
+        serializer.save(user=self.request.user, course=course)
+
+
+class AssignmentSubmissionCreateView(generics.CreateAPIView):
+    queryset = AssignmentSubmission.objects.all()
+    serializer_class = AssignmentSubmissionSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployee]
+
+    def perform_create(self, serializer):
+        assignment = get_object_or_404(Assignment, id=self.request.data.get('assignment'))
+        serializer.save(user=self.request.user, assignment=assignment)
+
+
+class LessonProgressUpdateView(generics.UpdateAPIView):
+    queryset = LessonProgressTracker.objects.all()
+    serializer_class = LessonProgressSerializer
+    permission_classes = [IsAuthenticated, IsEmployee]
+
+    def perform_update(self, serializer):
+        progress = self.get_object()
+
+        # Ensure only the owner can update the progress
+        if progress.user != self.request.user:
+            raise PermissionDenied("You cannot update someone else's progress.")
+
+        serializer.save()
+
+
+
+class QuizListView(generics.ListAPIView):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated]
+
+class QuizDetailView(generics.RetrieveAPIView):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated]
+
+class QuizSubmissionView(generics.CreateAPIView):
+    queryset = QuizSubmission.objects.all()
+    serializer_class = QuizSubmissionSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        quiz = get_object_or_404(Quiz, id=self.request.data.get('quiz'))
+        user = self.request.user
+
+        # Logic to calculate score based on user's answers
+        submitted_answers = self.request.data.get('answers', [])
+        correct_answers = 0
+        total_questions = quiz.questions.count()
+
+        for answer in submitted_answers:
+            question_id = answer.get('question_id')
+            selected_answer_id = answer.get('answer_id')
+            correct_answer = Answer.objects.filter(question_id=question_id, is_correct=True).first()
+
+            if correct_answer and correct_answer.id == selected_answer_id:
+                correct_answers += 1
+
+        # Calculate score as a percentage
+        score = (correct_answers / total_questions) * 100
+
+        # Save the submission
+        serializer.save(user=user, quiz=quiz, score=score)
+
+
+class ResourceListView(generics.ListAPIView):
+    serializer_class = ResourceSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        lesson_id = self.request.query_params.get('lesson', None)
+        module_id = self.request.query_params.get('module', None)
+
+        if lesson_id:
+            return Resource.objects.filter(lesson_id=lesson_id)
+        elif module_id:
+            return Resource.objects.filter(module_id=module_id)
+        return Resource.objects.none()
+
+class ResourceCreateView(generics.CreateAPIView):
+    queryset = Resource.objects.all()
+    serializer_class = ResourceSerializer
+    permission_classes = [IsAuthenticated, IsEmployer]
+
+    def perform_create(self, serializer):
+        lesson_id = self.request.data.get('lesson')
+        module_id = self.request.data.get('module')
+
+        if lesson_id:
+            lesson = get_object_or_404(Lesson, id=lesson_id)
+
+            # Ensure the lesson creator (via module) is the same as the request user
+            if lesson.module.course.created_by != self.request.user:
+                raise PermissionDenied("Only the employer who created the lesson can add resources.")
+
+            serializer.save(lesson=lesson)
+        
+        elif module_id:
+            module = get_object_or_404(Module, id=module_id)
+
+            # Ensure the module creator is the same as the request user
+            if module.course.created_by != self.request.user:
+                raise PermissionDenied("Only the employer who created the module can add resources.")
+
+            serializer.save(module=module)
+
