@@ -81,7 +81,7 @@ class LoginAPIView(APIView):
         
         # response data
         response_data = {
-            'access_token': str(AccessToken.for_user(user).access_token),
+            'access_token': str(AccessToken.for_user(user)),
             'refresh_token': str(RefreshToken.for_user(user)),
             'user_id': user.id,
             'email': user.email,
