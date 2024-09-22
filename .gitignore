@@ -76,7 +76,6 @@ coverage.xml
 
 # Django specific
 local_settings.py
-staticfiles/
 media/
 
 # Sphinx documentation
