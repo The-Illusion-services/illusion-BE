@@ -50,10 +50,73 @@ class GoogleSignUpSerializer(serializers.Serializer):
 
 
 
-class CourseSerializer(serializers.ModelSerializer):
-    created_by = serializers.ReadOnlyField(source='created_by.username')
+
+class LessonSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Course
-        read_only_fields = ['id','created_by', 'created_at', 'updated_at']
+        model = Lesson
         fields = '__all__'
 
+
+class ModuleSerializer(serializers.ModelSerializer):
+    lessons = LessonSerializer(many=True, required=False)  # Include lessons in the module
+
+    class Meta:
+        model = Module
+        fields = '__all__'
+
+    def create(self, validated_data):
+        lessons_data = validated_data.pop('lessons', [])
+        module = Module.objects.create(**validated_data)  # Create the module
+
+        for lesson_data in lessons_data:
+            Lesson.objects.create(module=module, **lesson_data)  # Create lessons for this module
+
+        return module
+
+    def update(self, instance, validated_data):
+        # Pop out the lessons data from validated data
+        lessons_data = validated_data.pop('lessons', [])
+
+        # Update module fields
+        instance = super().update(instance, validated_data)
+
+        # Create a list of existing lesson IDs
+        existing_lessons = instance.lessons.all()  # Get all lessons of the module
+        existing_lessons_ids = [lesson.id for lesson in existing_lessons]
+
+        # Process incoming lessons data
+        for lesson_data in lessons_data:
+            lesson_id = lesson_data.get('id', None)
+
+            # Update existing lesson if it's in the module
+            if lesson_id and lesson_id in existing_lessons_ids:
+                lesson_instance = Lesson.objects.get(id=lesson_id, module=instance)
+                LessonSerializer().update(lesson_instance, lesson_data)
+
+            # If it's a new lesson (no ID), create it
+            else:
+                Lesson.objects.create(module=instance, **lesson_data)
+
+    
+
+        return instance
+
+
+
+class CourseSerializer(serializers.ModelSerializer):
+    created_by = serializers.ReadOnlyField(source='created_by.username')
+    modules = ModuleSerializer(many=True, required=False)  # Include modules in the course
+
+    class Meta:
+        model = Course
+        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+        fields = '__all__'
+
+
+
+
+class AssignmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Assignment
+        fields = '__all__'
+        read_only_fields = ['created_by', 'created_at', 'updated_at']
