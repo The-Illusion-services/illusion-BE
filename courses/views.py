@@ -1,3 +1,6 @@
+from rest_framework.exceptions import ValidationError
+from rest_framework.response import Response
+from rest_framework import status
 from django.shortcuts import get_object_or_404, render
 from rest_framework.exceptions import PermissionDenied
 # Create your views here.
@@ -134,9 +137,38 @@ class EnrollCourseView(generics.CreateAPIView):
     serializer_class = EnrollmentSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsEmployee]
 
-    def perform_create(self, serializer):
-        course = get_object_or_404(Course, id=self.request.data.get('course'))
-        serializer.save(user=self.request.user, course=course)
+    def create(self, request, *args, **kwargs):
+        course = get_object_or_404(Course, id=request.data.get('course'))
+        user = request.user
+
+        # Check if the user is already enrolled in the course
+        if Enrollment.objects.filter(user=user, course=course).exists():
+            raise ValidationError({"message": "You are already enrolled in this course."})
+
+        # Proceed to create the enrollment
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save(user=user, course=course)
+
+        # Return custom success response
+        response_data = {
+            "message": "You have been enrolled successfully",
+            "enrollment": serializer.data  # You can include the serialized data for more details
+        }
+        return Response(response_data, status=status.HTTP_201_CREATED)
+
+
+class EnrollmentListView(generics.ListAPIView):
+    serializer_class = EnrollmentSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    def get_queryset(self):
+        # Get the course based on the provided course_id in the URL
+        course_id = self.kwargs.get('course_id')
+        course = get_object_or_404(Course, id=course_id)
+        
+        # Filter enrollments by the selected course
+        return Enrollment.objects.filter(course=course)
 
 
 class AssignmentSubmissionCreateView(generics.CreateAPIView):

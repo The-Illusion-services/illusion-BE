@@ -113,9 +113,11 @@ class CourseSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EnrollmentSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
     class Meta:
         model = Enrollment
-        fields = '__all__'
+        read_only_fields = ['user', 'enrollment_date']
+        fields = ['user', 'course', 'enrollment_date']
 
 
 

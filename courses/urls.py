@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     AssignmentSubmissionCreateView, CourseCreate, CourseList,
-    EnrollCourseView, LessonListView,
+    EnrollCourseView, EnrollmentListView, LessonListView,
     LessonProgressUpdateView, 
     ModuleCreateView, 
     ModuleListView, ModuleUpdateView,
@@ -24,6 +24,7 @@ urlpatterns = [
     path('assignments/submit/', AssignmentSubmissionCreateView.as_view(), name='assignment_submit'),
     path('lessons/progress/<int:pk>/', LessonProgressUpdateView.as_view(), name='lesson_progress_update'),
     path('courses/enroll/', EnrollCourseView.as_view(), name='course_enroll'),
+    path('courses/<int:course_id>/enrollments/', EnrollmentListView.as_view(), name='course-enrollments'),
     path('quizzes/', QuizListView.as_view(), name='quiz_list'),
     path('quizzes/<int:pk>/', QuizDetailView.as_view(), name='quiz_detail'),
     path('quizzes/submit/', QuizSubmissionView.as_view(), name='quiz_submit'),
