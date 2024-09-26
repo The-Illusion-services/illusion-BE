@@ -7,7 +7,7 @@ import uuid
 ROLE_CHOICES = [
    ( 'Employee', 'Employee'),
    ('Employer', 'Employer'),
-   ('Super Admin','Super Admin'),
+   
 ]
 
 class User(AbstractUser):

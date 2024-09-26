@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
-
+from decouple import config
 from os import getenv
 from dotenv import load_dotenv
 # Load environment variables from .env file
@@ -50,13 +50,15 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # app handling the google auth
     'rest_framework',
-    'rest_framework_simplejwt',     
+    'rest_framework_simplejwt', 
+    'rest_framework_swagger',
+    'drf_yasg',    
+    'corsheaders',
 
     # django app
     'accounts',
     'courses',
     'setting',
-    'quizzes'
 ]
 
 
@@ -68,8 +70,8 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=10),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=20),
 }
 
 
@@ -125,6 +127,10 @@ WSGI_APPLICATION = 'illusion.wsgi.application'
 
 # Replace the DATABASES section of your settings.py with this
 DATABASES = {
+    #  'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': str(BASE_DIR / 'db.sqlite3'),
+    # },
   'default': {
     'ENGINE': 'django.db.backends.postgresql',
     'NAME': getenv('PGDATABASE'),
@@ -173,7 +179,17 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+if DEBUG:
+  STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+else:
+  STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+
+# MEDIA_URL = "media/"
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -188,3 +204,11 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # Default
     # 'allauth.account.auth_backends.AuthenticationBackend',  # For social auth
 )
+
+CORS_ORIGIN_ALLOW_ALL = config('CORS_ORIGIN_ALLOW_ALL', default=False, cast=bool)
+CORS_ALLOWED_ORIGINS = [origin.strip() for origin in config('CORS_ALLOWED_ORIGINS').split(',')]
+CORS_ALLOW_METHODS = [method.strip() for method in config('CORS_ALLOW_METHODS').split(',')]
+CORS_ALLOW_HEADERS = [header.strip() for header in config('CORS_ALLOW_HEADERS').split(',')]
+CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in config('CSRF_TRUSTED_ORIGINS').split(',')]
+CORS_ALLOW_CREDENTIALS = True
+CORS_EXPOSE_HEADERS = ["Content-Type", "X-CSRFToken"]

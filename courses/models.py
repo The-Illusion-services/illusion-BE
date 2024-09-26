@@ -4,86 +4,105 @@ from accounts.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 
-class CourseType(models.Model):
-    course_type=models.CharField(max_length=50)
-    def __str__(self):
-        return self.course_type
 
-class Course(models.Model):
-    course_type_id=models.ForeignKey(CourseType,on_delete=models.CASCADE)
-    course_title=models.CharField(max_length=200)
-    course_description=models.TextField()
-    order=models.CharField(max_length=20)
-
-    def __str__(self):
-        return self.course_title
-    
-class Instructor(models.Model):
-    user=models.ForeignKey(User,on_delete=models.CASCADE)
-    contact_address=models.TextField()
-    call_num=models.CharField(max_length=40)
-
-    def __str__(self):
-        return self.user_registration_id
-
-class Lesson(models.Model):
-    course_id= models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')
-    instructor_id = models.ForeignKey(Instructor, on_delete=models.SET_NULL, null=True, related_name='lessons')
-   # title = models.CharField(max_length=200)
-    lesson_content = models.TextField()
-    order = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.lesson_content
-    
-class resources(models.Model):
-    lesson_id=models.ForeignKey(Lesson,on_delete=models.CASCADE)
-    resource_title=models.TextField()
-    resource_link=models.TextField()
-
-    def __str__(self):
-        return self.resource_title
-    
-class Section(models.Model):
-    lesson_id=models.ForeignKey(Lesson,on_delete=models.CASCADE)
-    title=models.CharField(max_length=200)
-    content=models.TextField()
-    order=models.IntegerField()
-
-    def __str__(self):
-        return self.title
-
-class LearningPath(models.Model):
-    DIFFICULTY_CHOICES = [
+DIFFICULTY_CHOICES = [
         ('beginner', 'Beginner'),
         ('intermediate', 'Intermediate'),
         ('advanced', 'Advanced'),
     ]
 
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    creator = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_paths')
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    is_published = models.BooleanField(default=False)
-    difficulty_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES)
-    estimated_duration = models.IntegerField(help_text="Estimated duration in hours")
+class Course(models.Model):
+    course_title = models.CharField(max_length=200)
+    course_description = models.TextField()
+    # course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
+    course_language = models.CharField(max_length=50, default='English')
+    
+    
+    course_level = models.CharField(
+        max_length=50, 
+        choices=[('Beginner', 'Beginner'), ('Intermediate', 'Intermediate'), ('Advanced', 'Advanced'), ('Web3 Expert', 'Web3 Expert')],
+        default='Beginner'
+    )
+    
+    # Web3-specific topics or categories
+    course_category = models.CharField(
+        max_length=100, 
+        choices=[
+            ('Blockchain Basics', 'Blockchain Basics'),
+            ('Smart Contracts', 'Smart Contracts'),
+            ('dApp Development', 'dApp Development'),
+            ('Decentralized Governance', 'Decentralized Governance'),
+            ('Crypto Wallets', 'Crypto Wallets'),
+            ('NFTs', 'NFTs'),
+            ('DeFi', 'DeFi'),
+        ], default=''
+    )
+
+    
+    price = models.DecimalField(max_digits=8, decimal_places=2, default='')  # Adjust max_digits as needed
+    
    
+    certification = models.BooleanField(default=False)
+
+    difficulty_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
+    estimated_duration = models.IntegerField(help_text="Estimated duration in hours", default=1)
+    
+    # Tracking creation and updates
+    created_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.course_title} - {self.created_by}"
+
+class Module(models.Model):
+    title=models.CharField(max_length=200)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sections')
+
+
     def __str__(self):
         return self.title
+class Lesson(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True, related_name='lessons')
+    title = models.CharField(max_length=200, default='')
+    description = models.TextField()
+    is_published = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} Lesson - from {self.course} - created by {self.course}"
+
+class Resource(models.Model):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
+    resource_title = models.CharField(max_length=255)
+    resource_link = models.URLField()
+
+    def __str__(self):
+        return f"Resource: {self.resource_title}"
+
     
-class lesson_progress_tracker(models.Model):
-    lesson_id=models.ForeignKey(Lesson, on_delete=models.CASCADE)
-    user=models.ForeignKey(User, on_delete=models.CASCADE)
-    last_accessed_timestamp=models.DateTimeField(null=True,blank=True)
-    is_completed=models.BooleanField()
-    learning_path_id=models.ForeignKey(LearningPath,on_delete=models.CASCADE)
-   
-    def __str__(self) -> str:
-        return super().__str__()
+class Assignment(models.Model):
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
+    due_date = models.DateTimeField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Enrollment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrollments')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrollments')
+    enrollment_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} enrolled in {self.course.course_title}"
+
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='reviews')
@@ -100,26 +119,15 @@ class Review(models.Model):
         unique_together = ['user', 'course']  # Ensure one review per user per course
         
 class ReviewResponse(models.Model):
-    review_id=models.ForeignKey(Review, on_delete=models.CASCADE)
-    instructor_id=models.ForeignKey(Instructor, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, on_delete=models.CASCADE)
     content=models.TextField()
     created_timestamp = models.DateTimeField(auto_now=True)
 
-class Assignment(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField()
-    course_id =models.ForeignKey(Course,on_delete=models.CASCADE)
-    Instructor_id = models.ForeignKey(Instructor,on_delete=models.CASCADE)
-    due_date = models.DateTimeField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return self.title
     
 class AssignmentSubmission(models.Model):
-    assignment_id = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
-    user= models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
     assigment_content = models.TextField()
     file = models.FileField(upload_to='submissions/', null=True, blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
@@ -128,3 +136,51 @@ class AssignmentSubmission(models.Model):
      
     def __str__(self):
         return f"Submission for {self.assignment_id.title} by {self.user.first_name}"
+    
+
+class LessonProgressTracker(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    is_completed = models.BooleanField(default=False)
+    last_accessed_timestamp = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.user.username}'s progress on {self.lesson.title}"
+
+
+
+
+
+
+class Quiz(models.Model):
+    title = models.CharField(max_length=255)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="quizzes")
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Quiz: {self.title} for {self.course.course_title}"
+
+class Question(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
+    question_text = models.TextField()
+
+    def __str__(self):
+        return f"Question: {self.question_text}"
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
+    answer_text = models.CharField(max_length=255)
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Answer: {self.answer_text} (Correct: {self.is_correct})"
+
+class QuizSubmission(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    score = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+
+    def __str__(self):
+        return f"Submission by {self.user.username} for Quiz {self.quiz.title}"

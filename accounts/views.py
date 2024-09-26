@@ -3,7 +3,7 @@ from django.shortcuts import render
 # Create your views here.
 from .models import *
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
-from .serializers import *
+from serializers.serializers import *
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status, viewsets
@@ -81,7 +81,7 @@ class LoginAPIView(APIView):
         
         # response data
         response_data = {
-            'access_token': str(AccessToken.for_user(user).access_token),
+            'access_token': str(AccessToken.for_user(user)),
             'refresh_token': str(RefreshToken.for_user(user)),
             'user_id': user.id,
             'email': user.email,
