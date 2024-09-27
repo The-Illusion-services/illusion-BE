@@ -65,7 +65,7 @@ class Module(models.Model):
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True, related_name='lessons')
     title = models.CharField(max_length=200, default='')
-    description = models.TextField()
+    description = models.TextField(default="")
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -85,9 +85,9 @@ class Resource(models.Model):
 class Assignment(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='assignments',default="")
     due_date = models.DateTimeField()
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE,default="")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -97,7 +97,7 @@ class Assignment(models.Model):
 
 class Enrollment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='enrollments')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrollments')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='enrollments',default="")
     enrollment_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -105,7 +105,7 @@ class Enrollment(models.Model):
 
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='reviews')
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='reviews',default=None)
     rating = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)])
     content = models.TextField()
     created_timestamp = models.DateTimeField(auto_now_add=True)
@@ -119,15 +119,15 @@ class Review(models.Model):
         unique_together = ['user', 'course']  # Ensure one review per user per course
         
 class ReviewResponse(models.Model):
-    review = models.ForeignKey(Review, on_delete=models.CASCADE)
+    review = models.ForeignKey(Review, default="", on_delete=models.CASCADE,)
     content=models.TextField()
     created_timestamp = models.DateTimeField(auto_now=True)
 
 
     
 class AssignmentSubmission(models.Model):
-    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions')
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions')
+    assignment = models.ForeignKey(Assignment, on_delete=models.CASCADE, related_name='submissions',default="")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='submissions',default="")
     assigment_content = models.TextField()
     file = models.FileField(upload_to='submissions/', null=True, blank=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
@@ -139,8 +139,8 @@ class AssignmentSubmission(models.Model):
     
 
 class LessonProgressTracker(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, default="", on_delete=models.CASCADE)
+    lesson = models.ForeignKey(Lesson, default=False, on_delete=models.CASCADE)
     is_completed = models.BooleanField(default=False)
     last_accessed_timestamp = models.DateTimeField(auto_now=True)
 
@@ -154,8 +154,8 @@ class LessonProgressTracker(models.Model):
 
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="quizzes")
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, default=False, on_delete=models.CASCADE, related_name="quizzes")
+    created_by = models.ForeignKey(User, default=False, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
