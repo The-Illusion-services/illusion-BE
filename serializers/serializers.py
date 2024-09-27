@@ -170,3 +170,12 @@ class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
         fields = ['id', 'lesson', 'module', 'resource_title', 'resource_link']
+
+
+class CertificationSerializer(serializers.ModelSerializer):
+    user = serializers.ReadOnlyField(source='user.username')
+    course = serializers.ReadOnlyField(source='course.course_title')
+    class Meta:
+        model = Certification
+        fields = ['id', 'user', 'course', 'issued_on', 'certificate_code', 'is_verified']
+        read_only_fields = ['id', 'issued_on', 'certificate_code']
