@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.contrib.auth.models import User
 from accounts.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -184,3 +185,29 @@ class QuizSubmission(models.Model):
 
     def __str__(self):
         return f"Submission by {self.user.username} for Quiz {self.quiz.title}"
+
+
+
+
+class Certification(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='certifications')
+    course = models.ForeignKey('Course', on_delete=models.CASCADE, related_name='certifications')
+    issued_on = models.DateTimeField(default=timezone.now)
+    certificate_code = models.CharField(max_length=20, unique=True)
+    is_verified = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Certification for {self.user.username} - {self.course.course_title}"
+
+    def generate_certificate_code(self):
+        """
+        Generates a unique certificate code, this can be customized as needed.
+        """
+        import uuid
+        self.certificate_code = uuid.uuid4().hex[:10].upper()
+
+    def save(self, *args, **kwargs):
+        # Generate certificate code before saving if not set
+        if not self.certificate_code:
+            self.generate_certificate_code()
+        super().save(*args, **kwargs)

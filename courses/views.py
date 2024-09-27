@@ -1,6 +1,7 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.response import Response
 from rest_framework import status
+from drf_yasg import openapi
 from django.shortcuts import get_object_or_404, render
 from rest_framework.exceptions import PermissionDenied
 # Create your views here.
@@ -210,7 +211,7 @@ class QuizDetailView(generics.RetrieveAPIView):
 class QuizSubmissionView(generics.CreateAPIView):
     queryset = QuizSubmission.objects.all()
     serializer_class = QuizSubmissionSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsEmployee]
 
     def perform_create(self, serializer):
         quiz = get_object_or_404(Quiz, id=self.request.data.get('quiz'))
@@ -277,3 +278,32 @@ class ResourceCreateView(generics.CreateAPIView):
 
             serializer.save(module=module)
 
+class CertificationListCreateView(generics.ListCreateAPIView):
+    queryset = Certification.objects.all()
+    serializer_class = CertificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Optionally restricts the returned certifications to the current user.
+        """
+        return Certification.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """
+        Set the user as the owner of the certification when creating.
+        """
+        serializer.save(user=self.request.user)
+
+
+# Retrieve, update a certification
+class CertificationDetailView(generics.RetrieveAPIView):
+    queryset = Certification.objects.all()
+    serializer_class = CertificationSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Restrict the queryset to only allow users to access their own certifications.
+        """
+        return Certification.objects.filter(user=self.request.user)

@@ -1,5 +1,6 @@
 from django.shortcuts import render
-
+from drf_yasg import openapi
+from drf_yasg.utils import swagger_auto_schema
 # Create your views here.
 from .models import *
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
@@ -28,58 +29,84 @@ class UserRegistrationView(APIView):
     """
     permission_classes = [AllowAny]
 
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'first_name': openapi.Schema(type=openapi.TYPE_STRING, description='First Name'),
+                'last_name': openapi.Schema(type=openapi.TYPE_STRING, description='Last Name'),
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
+                'confirm_password': openapi.Schema(type=openapi.TYPE_STRING, description='Confirm Password'),
+                'company': openapi.Schema(type=openapi.TYPE_STRING, description='Company'),
+                'role': openapi.Schema(type=openapi.TYPE_STRING, enum=['Employee', 'Employer'], description='Role'),
+            },
+            required=['first_name', 'last_name', 'email', 'password', 'confirm_password', 'role'],
+        ),
+        responses={201: 'Account Created', 400: 'Error'}
+    )
     def post(self, request):
-        
         data = request.data
-        if data['password'] != data['confirm_password']:
+
+        # Check if password and confirm password match
+        if data['password'] != data.get('confirm_password'):
             return Response({'error': 'Passwords do not match'}, status=status.HTTP_400_BAD_REQUEST)
 
+        # Serialize the data for user creation
         serializer = UserSerializer(data={
             'first_name': data['first_name'],
             'last_name': data['last_name'],
             'email': data['email'],
             'password': data['password'],
-            'company':data['company'],
+            'company': data.get('company', ''),
             'role': data['role']
         })
 
+        # Validate and save user
         if serializer.is_valid():
             user = serializer.save()
-            user.save()
 
+            # Generate tokens for the user
             response_data = {
                 'access_token': str(AccessToken.for_user(user)),
                 'refresh_token': str(RefreshToken.for_user(user)),
                 'message': 'Account Creation Successful'
             }
 
-            
-
             return Response(response_data, status=status.HTTP_201_CREATED)
+        
+        # Return errors if any
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class LoginAPIView(APIView):
     permission_classes = [AllowAny]
 
-
-
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
+                'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
+            },
+            required=['email', 'password'],
+        ),
+        responses={200: 'Token', 400: 'Error'}
+    )
     def post(self, request):
         email = request.data.get('email')
         password = request.data.get('password')
 
-        # Authenticate user
-        user = User.objects.filter(email=email).first()
+        if not email or not password:
+            return Response({'error': 'Email and password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Use Django's built-in authenticate function
+        user = authenticate(request, username=email, password=password)
 
         if user is None:
-            raise AuthenticationFailed('User not found')
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if not user.check_password(password):
-            raise AuthenticationFailed('Incorrect password')
-
-        
-        # response data
+        # Generate tokens and return response data
         response_data = {
             'access_token': str(AccessToken.for_user(user)),
             'refresh_token': str(RefreshToken.for_user(user)),
@@ -88,10 +115,7 @@ class LoginAPIView(APIView):
             'role': user.role,
         }
 
-        
-
         return Response(response_data, status=status.HTTP_200_OK)
-
 
 
 class GoogleSignUpView(APIView):

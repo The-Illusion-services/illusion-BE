@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    AssignmentSubmissionCreateView, CourseCreate, CourseList,
+    AssignmentSubmissionCreateView, CertificationDetailView, CertificationListCreateView, CourseCreate, CourseList,
     EnrollCourseView, EnrollmentListView, LessonListView,
     LessonProgressUpdateView, 
     ModuleCreateView, 
@@ -30,4 +30,8 @@ urlpatterns = [
     path('quizzes/submit/', QuizSubmissionView.as_view(), name='quiz_submit'),
     path('resources/', ResourceListView.as_view(), name='resource_list'),
     path('resources/create/', ResourceCreateView.as_view(), name='resource_create'),
+    path('certifications/', CertificationListCreateView.as_view(), name='certification-list-create'),
+
+    # Retrieve, update a certification
+    path('certifications/<int:pk>/', CertificationDetailView.as_view(), name='certification-detail'),
 ]
