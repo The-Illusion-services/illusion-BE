@@ -197,6 +197,13 @@ class LessonProgressUpdateView(generics.UpdateAPIView):
         serializer.save()
 
 
+class QuizCreateView(generics.CreateAPIView):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated, IsEmployer]  # Ensure only employers can create quizzes
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 class QuizListView(generics.ListAPIView):
     queryset = Quiz.objects.all()
