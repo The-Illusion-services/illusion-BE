@@ -7,7 +7,7 @@ from .views import (
     ModuleListView, ModuleUpdateView,
     AssignmentCreateView,
     AssignmentUpdateView,
-    AssignmentListView, QuizDetailView, QuizListView,
+    AssignmentListView, QuizCreateView, QuizDetailView, QuizListView,
       QuizSubmissionView, ResourceCreateView, ResourceListView
 )
 
@@ -26,6 +26,7 @@ urlpatterns = [
     path('courses/enroll/', EnrollCourseView.as_view(), name='course_enroll'),
     path('courses/<int:course_id>/enrollments/', EnrollmentListView.as_view(), name='course-enrollments'),
     path('quizzes/', QuizListView.as_view(), name='quiz_list'),
+    path('quizzes/create/', QuizCreateView.as_view(), name='quiz_create'),
     path('quizzes/<int:pk>/', QuizDetailView.as_view(), name='quiz_detail'),
     path('quizzes/submit/', QuizSubmissionView.as_view(), name='quiz_submit'),
     path('resources/', ResourceListView.as_view(), name='resource_list'),
