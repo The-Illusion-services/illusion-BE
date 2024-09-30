@@ -36,62 +36,62 @@ source venv/bin/activate  # On Windows use `venv\Scripts\activate` # to activate
  <strong><em> python manage.py migrate</strong></em>
  </li>
 </ol>
-Usage
-For usage of the project, use the command
+<h3>Usage</h3>
+For usage of the project, use the command<br>
 <strong><em>python manage.py runserver</strong></em>
 
 The APIs will be available at <a href="https://illusion-6ga5.onrender.com/docs/"> https://illusion-6ga5.onrender.com/docs/ </a>
 
-API Endpoints
-The follwoing are API Endpoints 
+<h3>API Endpoints</h3>
+The follwoing are API Endpoints<br>
 
-assignments 
-POST /assignments/create/: To create assignments by instructors
-POST /assignments/submit/{user_id}: To submite assignments by candidates
-PUT /assignments/update/{id}/: full update of the assignment (put)
-PATCH /assignments/update/{id}/: Partial update of the assignment(patch)
+<h4>assignments</h4>
+<strong><em>POST /assignments/create/: To create assignments by instructors</em></strong><br>
+P<strong><em>OST /assignments/submit/{user_id}: To submite assignments by candidates</em></strong><br>
+<strong><em>PUT /assignments/update/{id}/: full update of the assignment (put)</em></strong><br>
+<strong><em>PATCH /assignments/update/{id}/: Partial update of the assignment(patch)</em></strong><br>
 
-certifications
-GET /certifications/: List of certificates
-POST /certifications/create: Create certificates
-GET /certifications/{id}: read individual certificate
+<h4>certifications</h4>
+<strong><em>GET /certifications/: List of certificates</em></strong><br>
+<strong><em>POST /certifications/create: Create certificates</em></strong><br>
+<strong><em>GET /certifications/{id}: read individual certificate</em></strong><br>
 
-courses
-GET /courses/: List of courses
-POST /courses/enrol: create course enrolment
-GET /courses/{course_id}/assignments/: course assignment list
-GET /courses/{course_id}/enrollments/: course enrolment list
-POST /create-course/: create course 
-POST /create-module/: create course modules
-GET /modules/: list of modules
-PUT /update-module/{id}/: update full detail modules(put)
-PATCH /update-module/{id}/: update partial details modules(patch)
+<h4>courses</h4>
+<strong><em>GET /courses/: List of courses</em></strong><br>
+<strong><em>POST /courses/enrol: create course enrolment</em></strong><br>
+<strong><em>GET /courses/{course_id}/assignments/: course assignment list</em></strong><br>
+<strong><em>GET /courses/{course_id}/enrollments/: course enrolment list</em></strong><br>
+<strong><em>POST /create-course/: create course </em></strong><br>
+<strong><em>POST /create-module/: create course modules</em></strong><br>
+<strong><em>GET /modules/: list of modules</em></strong><br>
+<strong><em>PUT /update-module/{id}/: update full detail modules(put)</em></strong><br>
+<strong><em>PATCH /update-module/{id}/: update partial details modules(patch)</em></strong><br>
 
 
-google-signup
-POST /google-signup/: signup using google api
+<h4>google-signup</h4>
+<strong><em>POST /google-signup/: signup using google api</em></strong><br>
 
-lessons
-GET /lessons/: list of lessons
-PUT /lessons/progress/{id}/: lesson progress update(put)
-PATCH /lessons/progress/{id}/: lesson progress partial update(patch)
+<h4>lessons</h4>
+<strong><em>GET /lessons/: list of lessons</em></strong><br>
+<strong><em>PUT /lessons/progress/{id}/: lesson progress update(put)</em></strong><br>
+<strong><em>PATCH /lessons/progress/{id}/: lesson progress partial update(patch)</em></strong><br>
 
-login
-POST /login/: create login
-GET /protected/: protected list
+<h4>login</h4>
+<strong><em>POST /login/: create login</em></strong><br>
+<strong><em>GET /protected/: protected list</em></strong><br>
 
-quizzes
-GET /quizzes/: list of quizzes
-POST /quizzes/create/: create quizzes
-POST /quizzes/submit/: submit quiz by candidates
-GET /quizzes/{id}/: read individual quiz
+<h4>quizzes</h4>
+<strong><em>GET /quizzes/: list of quizzes</em></strong><br>
+<strong><em>POST /quizzes/create/: create quizzes</em></strong><br>
+<strong><em>POST /quizzes/submit/: submit quiz by candidates</em></strong><br>
+<strong><em>GET /quizzes/{id}/: read individual quiz</em></strong><br>
 
-register
-POST /register/: create new user
+<h4>register</h4>
+<strong><em>POST /register/: create new user
 
-resources
-GET /resources/: list of resources
-POST /resources/create/: create resources
+<h4>resources</h4>
+<strong><em>GET /resources/: list of resources</em></strong><br>
+<strong><em>POST /resources/create/: create resources</em></strong><br>
 
 Technologies Used
 sgiref
