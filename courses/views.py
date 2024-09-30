@@ -197,6 +197,13 @@ class LessonProgressUpdateView(generics.UpdateAPIView):
         serializer.save()
 
 
+class QuizCreateView(generics.CreateAPIView):
+    queryset = Quiz.objects.all()
+    serializer_class = QuizSerializer
+    permission_classes = [IsAuthenticated, IsEmployer]  # Ensure only employers can create quizzes
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
 class QuizListView(generics.ListAPIView):
     queryset = Quiz.objects.all()
@@ -231,10 +238,19 @@ class QuizSubmissionView(generics.CreateAPIView):
                 correct_answers += 1
 
         # Calculate score as a percentage
-        score = (correct_answers / total_questions) * 100
+        score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
 
         # Save the submission
-        serializer.save(user=user, quiz=quiz, score=score)
+        submission = serializer.save(user=user, quiz=quiz, score=score)
+
+        # If the user has completed the course (all quizzes), generate a certificate
+        course = quiz.course
+        all_quizzes = course.quizzes.count()
+        completed_quizzes = QuizSubmission.objects.filter(user=user, quiz__course=course).count()
+
+        if completed_quizzes == all_quizzes and not Certification.objects.filter(user=user, course=course).exists():
+            # Create a certificate and mark it as verified
+            Certification.objects.create(user=user, course=course, is_verified=True)
 
 
 class ResourceListView(generics.ListAPIView):
