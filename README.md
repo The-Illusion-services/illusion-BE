@@ -1,19 +1,21 @@
 <h3>Project Title:<strong>Illusion Academy: AI-Powered Internal Corporate Training Software for Web 3 Companies</strong></h3> 
 
-Illusion Academy is designed to provide an all-in-one solution for Web 3 companies looking to streamline internal corporate training. The platform offers a suite of tools tailored for:
-=> Recruitment Testing: Helping recruiters assess candidates during the interview process.
-=> Educational Resources: Delivering teachings, lectures, and computer-based testing (CBT).
-=> Internal Training: Allowing companies to conduct in-house training efficiently.
+<em>Illusion Academy is designed to provide an all-in-one solution for Web 3 companies looking to streamline internal corporate training. The platform offers a suite of tools tailored for:</em>
+<ul>
+<li>Recruitment Testing: Helping recruiters assess candidates during the interview process.</li>
+<li>Educational Resources: Delivering teachings, lectures, and computer-based testing (CBT).</li>
+<li>Internal Training: Allowing companies to conduct in-house training efficiently.</li>
+</ul>
 
-Table of Contents
-
-Installation
-Usage
-API Endpoints
-Technologies Used
-Contributing
-License
-
+<h4>Table of Contents</h4>
+<ul type="square">
+<li>Installation</li>
+<li>Usage</li>
+<li>API Endpoints</li>
+<li>Technologies Used</li>
+<li>Contributing</li>
+<li>License</li>
+</ul>
 Installation
 For the installation of the project;
 1. clone the project directory from 
