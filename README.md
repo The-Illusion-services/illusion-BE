@@ -87,50 +87,51 @@ P<strong><em>OST /assignments/submit/{user_id}: To submite assignments by candid
 <strong><em>GET /quizzes/{id}/: read individual quiz</em></strong><br>
 
 <h4>register</h4>
-<strong><em>POST /register/: create new user
+<strong><em>POST /register/: create new user</em></strong><br>
 
 <h4>resources</h4>
 <strong><em>GET /resources/: list of resources</em></strong><br>
 <strong><em>POST /resources/create/: create resources</em></strong><br>
 
-Technologies Used
-sgiref
-certifi
-charset-normalizer
-coreapi
-coreschema
-Django
-django-rest-framework
-django-rest-swagger
-djangorestframework
-djangorestframework-simplejwt
-django-cors-headers
-python-decouple
-django-cors-headers
-python-decouple
-drf-yasg
-idna
-inflection
-itypes
-Jinja2
-MarkupSafe
-openapi-codec
-packaging
-pillow
-psycopg
-psycopg2
-PyJWT
-gunicorn
-python-dotenv
-pytz
-PyYAML
-requests
-simplejson
-sqlparse
-typing_extensions
-tzdata
-uritemplate
-urllib3
+<h3>Technologies Used</h3>
+<ul type="square">
+<li>sgiref</li>
+<li>certifi</li>
+<li>charset-normalizer</li>
+<li>coreapi</li>
+<li>coreschema</li>
+<li>Django</li>
+<li>django-rest-framework</li>
+<li>django-rest-swagger</li>
+<li>djangorestframework</li>
+<li>djangorestframework-simplejwt</li>
+<li>django-cors-headers</li>
+<li>python-decouple</li>
+<li>django-cors-headers</li>
+<li>python-decouple</li>
+<li>drf-yasg</li>
+<li>idna</li>
+<li>inflection</li>
+<li>itypes</li>
+<li>Jinja2</li>
+<li>MarkupSafe</li>
+<li>openapi-codec</li>
+<li>packaging</li>
+<li>pillow</li>
+<li>psycopg</li>
+<li>psycopg2</li>
+<li>PyJWT</li>
+<li>gunicorn</li>
+<li>python-dotenv</li>
+<li>pytz</li>
+<li>PyYAML</li>
+<li>requests</li>
+<li>simplejson</li>
+<li>sqlparse</li>
+<li>typing_extensions</li>
+<li>tzdata</li>
+<li>uritemplate</li>
+<li>urllib3</li>
 
 Contributing
 
