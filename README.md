@@ -16,23 +16,29 @@
 <li>Contributing</li>
 <li>License</li>
 </ul>
-Installation
+<h3>Installation</h3>
 For the installation of the project;
-1. clone the project directory from 
-git clone https://github.com/The-Illusion-services/illusion-BE.git
-2. Navigate to the project directory in your local machine 
-cd your_repo_name
-3. Create a virtual environment and activate it:
-python -m venv venv
-source venv/bin/activate  # On Windows use `venv\Scripts\activate` # to activate the virtual environment 
-4. install the require packages from requirements.txt
- pip install -r requirements.txt
-5. set up the database by running:
-  python manage.py migrate
-
+<ol>
+<li>clone the project directory from:<br>
+<em><strong>git clone https://github.com/The-Illusion-services/illusion-BE.git</strong></em>
+ </li>
+<li>Navigate to the project directory in your local machine <br>
+<strong><em>cd your_repo_name</strong></em>
+ </li>
+<li>Create a virtual environment and activate it:<br>
+<strong><em>python -m venv venv<br>
+source venv/bin/activate  # On Windows use `venv\Scripts\activate` # to activate the virtual environment </strong></em>
+ </li>
+<li> install the require packages from requirements.txt<br>
+<strong><em> pip install -r requirements.txt</strong></em>
+ </li>
+<li>set up the database by running:<br>
+ <strong><em> python manage.py migrate</strong></em>
+ </li>
+</ol>
 Usage
 For usage of the project, use the command
-python manage.py runserver
+<strong><em>python manage.py runserver</strong></em>
 
 The APIs will be available at <a href="https://illusion-6ga5.onrender.com/docs/"> https://illusion-6ga5.onrender.com/docs/ </a>
 
