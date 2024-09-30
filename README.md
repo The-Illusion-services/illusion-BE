@@ -71,7 +71,7 @@ P<strong><em>OST /assignments/submit/{user_id}: To submite assignments by candid
 <h4>google-signup</h4>
 <strong><em>POST /google-signup/: signup using google api</em></strong><br>
 
-<h4>profilep</h4>
+<h4>profile</h4>
 <strong><em>GET /profile/: profile list</em></strong><br>
 <strong><em>PATCH /profile/{id}: profile list</em></strong><br>
 
