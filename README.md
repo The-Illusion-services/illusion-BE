@@ -132,8 +132,6 @@ P<strong><em>OST /assignments/submit/{user_id}: To submite assignments by candid
 <li>tzdata</li>
 <li>uritemplate</li>
 <li>urllib3</li>
-
-Contributing
-
-
-License
+</ul>
+<h3>Contributing</h3>
+<h3>License</h3>
