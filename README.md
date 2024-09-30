@@ -132,8 +132,52 @@ P<strong><em>OST /assignments/submit/{user_id}: To submite assignments by candid
 <li>tzdata</li>
 <li>uritemplate</li>
 <li>urllib3</li>
+</ul>
+<h3>Contributing</h3>
+<p>
+We welcome contributions to improve <strong>Illusion Academy</strong>! As this project was initially developed during a hackathon, we're excited to see how it can grow with community input. Here's how you can contribute:
+ </p>
+<h3>Reporting Issues</h3>
+If you encounter any bugs or have suggestions for improvements:<br>
 
-Contributing
+Check the Issues page to see if it has already been reported.<br>
+If not, open a new issue. Please provide:<br>
+<ul>
+<li>A clear title and description</li>
+<li>As much relevant information as possible</li>
+<li>A code sample or an executable test case demonstrating the issue, if applicable</li>
+</ul>
 
+<h3>Suggesting Enhancements</h3>
+We're open to ideas! If you have suggestions for new features:
+<ul type="arrow">
+<li> Open a new issue on the Issues page.</li>
+<li>Use a clear and descriptive title.</li>
+<li>Provide a detailed description of the proposed feature.</li>
+<li>Explain why this enhancement would be useful to most users.</li>
+</ul>
 
-License
+<h3>Pull Requests</h3>
+We actively welcome your pull requests:
+<p>
+Fork the repo and create your branch from main.
+If you've added code that should be tested, add tests.
+If you've changed APIs, update the documentation.
+Ensure the test suite passes.
+Make sure your code lints.
+Issue that pull request!
+</p>
+<h4>Coding Style</h4>
+Please adhere to the coding style used throughout the project. In general:
+<ul type="square">
+<li>Follow PEP 8 for Python code.</li>
+<li>Use 4 spaces for indentation rather than tabs.</li>
+<li>Use docstrings for functions and classes.</li>
+</ul>
+<strong>License</strong>:
+By contributing, you agree that your contributions will be licensed under the same license that covers this project (see LICENSE file).
+
+<h5>Questions?</h5>
+If you have any questions about contributing, feel free to ask. We're here to help!
+Thank you for your interest in improving  <strong>Illusion Academy</strong>!!
+<h3>License</h3>
