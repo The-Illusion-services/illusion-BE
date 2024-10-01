@@ -1,6 +1,9 @@
 from django.shortcuts import render
+from accounts.serializers import ProfileSerializer
+from permissions import permissions
 from drf_yasg import openapi
 from drf_yasg.utils import swagger_auto_schema
+
 # Create your views here.
 from .models import *
 from rest_framework.exceptions import AuthenticationFailed, PermissionDenied
@@ -139,3 +142,30 @@ class ProtectedView(APIView):
 
     def get(self, request):
         return Response({"message": "You are authenticated"}, status=200)
+    
+
+class ProfileView(APIView):
+    serializer_class = ProfileSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        return User.objects.filter(user=self.kwargs['id'])
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data)
+    
+
+class UserViewSet(APIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [APIView]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            return [permissions.AllowAny()]
+        return super().get_permissions()
