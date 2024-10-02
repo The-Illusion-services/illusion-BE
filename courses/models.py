@@ -61,9 +61,10 @@ class Module(models.Model):
     title=models.CharField(max_length=200)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sections')
 
-
     def __str__(self):
         return self.title
+    
+    
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True, related_name='lessons')
     title = models.CharField(max_length=200, default='')
