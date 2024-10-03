@@ -54,11 +54,13 @@ INSTALLED_APPS = [
     'rest_framework_swagger',
     'drf_yasg',    
     'corsheaders',
+    'django_filters',
 
     # django app
     'accounts',
     'courses',
     'setting',
+    'jobs'
 ]
 
 
@@ -67,6 +69,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
 }
 
 SIMPLE_JWT = {

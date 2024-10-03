@@ -1,6 +1,4 @@
 
-my_env/
-
 # Python files
 *.pyc
 *.pyo
@@ -20,6 +18,7 @@ db.sqlite3
 venv/
 env/
 ENV/
+my_env/
 .venv/
 
 
