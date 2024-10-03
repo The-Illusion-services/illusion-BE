@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
@@ -203,7 +204,6 @@ class Certification(models.Model):
         """
         Generates a unique certificate code, this can be customized as needed.
         """
-        import uuid
         self.certificate_code = uuid.uuid4().hex[:10].upper()
 
     def save(self, *args, **kwargs):
