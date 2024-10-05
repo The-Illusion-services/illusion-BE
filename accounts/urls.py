@@ -15,7 +15,11 @@ urlpatterns = [
     path('google-signup/', GoogleSignUpView.as_view(), name='google-signup'),
     # path('google-login/', GoogleLogin.as_view(), name='google-login'),
     path('protected/', ProtectedView.as_view(), name='protected-view'),
+
     path('profile/', ProfileView.as_view(), name='profile'),
     path('', include(router.urls)),
     
+
+    path('profile/<int:id>', ProfileView.as_view(), name='profile'),
+
 ]

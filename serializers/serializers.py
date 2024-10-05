@@ -1,5 +1,7 @@
+from datetime import timedelta
 from accounts.models import *
 from courses.models import *
+from jobs.models import *
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -62,7 +64,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = '__all__'
+        fields = ['title', 'lessons']
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons', [])
@@ -102,7 +104,6 @@ class ModuleSerializer(serializers.ModelSerializer):
         return instance
 
 
-
 class CourseSerializer(serializers.ModelSerializer):
     created_by = serializers.ReadOnlyField(source='created_by.username')
     modules = ModuleSerializer(many=True, required=False)  # Include modules in the course
@@ -111,6 +112,27 @@ class CourseSerializer(serializers.ModelSerializer):
         model = Course
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
         fields = '__all__'
+
+    def create(self, validated_data):
+        # Extract modules and lessons from validated data
+        modules_data = validated_data.pop('modules', [])  # Extract modules data if any
+        
+        # Create the course first
+        course = Course.objects.create(**validated_data)  # Save the course
+        
+        # Now, handle creating modules and lessons
+        for module_data in modules_data:
+            lessons_data = module_data.pop('lessons', [])  # Extract lessons if any
+            
+            # Create each module, associate it with the course
+            module = Module.objects.create(course=course, **module_data)
+
+            # Create lessons for each module if any lessons provided
+            for lesson_data in lessons_data:
+                Lesson.objects.create(module=module, **lesson_data)
+
+        return course
+
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
@@ -179,3 +201,69 @@ class CertificationSerializer(serializers.ModelSerializer):
         model = Certification
         fields = ['id', 'user', 'course', 'issued_on', 'certificate_code', 'is_verified']
         read_only_fields = ['id', 'issued_on', 'certificate_code']
+
+
+
+
+
+"""
+Jobs creations and application sterializers
+"""
+
+class JobSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Job
+        fields = '__all__'
+    
+    def validate_title(self, value):
+        if len(value) < 8:
+            raise serializers.ValidationError("Job title must be at least 8 characters long.")
+        return value
+
+    def validate_min_salary(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Min Salary cannot be negative.")
+        return value
+    
+    def validate_max_salary(self, value):
+        if value < 0:
+            raise serializers.ValidationError("Min Salary cannot be negative.")
+        return value
+
+    def validate(self, data):
+        if 'job_descriptions' in data and 'title' in data:
+            if data['job_descriptions'].lower() == data['title'].lower():
+                raise serializers.ValidationError("Job description cannot be the same as the title.")
+        return data
+
+class ApplicationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Application
+        fields = '__all__'
+        read_only_fields = ('applicant', 'applied_at')
+
+    def validate_cover_letter(self, value):
+        if len(value) < 50:
+            raise serializers.ValidationError("Cover letter must be at least 50 characters long.")
+        return value
+
+    def validate_resume(self, value):
+        max_size = 3 * 1024 * 1024  # 5 MB
+        if value.size > max_size:
+            raise serializers.ValidationError("Resume file size cannot exceed 3 MB.")
+        return value
+
+    def validate(self, data):
+        if self.instance:  # This is an update
+            if self.instance.applied_at < timezone.now() - timedelta(days=1):
+                raise serializers.ValidationError("Applications cannot be edited after 24 hours.")
+        
+        if 'job' in data:
+            existing_application = Application.objects.filter(
+                job=data['job'],
+                applicant=self.context['request'].user
+            ).exists()
+            if existing_application:
+                raise serializers.ValidationError("You have already applied for this job.")
+        
+        return data
