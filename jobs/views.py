@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from jobs.models import Job, Application
-from accounts.serializers import JobSerializer, ApplicationSerializer
+from serializers.serializers import JobSerializer, ApplicationSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from .filters import JobFilter
 from rest_framework import viewsets, permissions, status
