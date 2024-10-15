@@ -207,6 +207,20 @@ REST_FRAMEWORK = { 'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.Dj
 AUTH_USER_MODEL = 'accounts.User'
 
 
+TOKEN_AUTHENTICATION_CLASS = 'rest_framework_simplejwt.authentication.JWTAuthentication'
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        # 'accounts.authenticate.CustomAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    ],
+
+
+}
+
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # Default
     # 'allauth.account.auth_backends.AuthenticationBackend',  # For social auth
