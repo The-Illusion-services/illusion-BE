@@ -8,7 +8,7 @@ from rest_framework.exceptions import PermissionDenied
 from rest_framework import generics
 from serializers.serializers import *
 from permissions.permissions import IsEmployee, IsEmployer 
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
+from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 
 
 
@@ -22,11 +22,24 @@ class CourseCreate(generics.CreateAPIView):
         serializer.save(created_by=self.request.user)
 
 
-class CourseList(generics.ListAPIView):
+class AvailableCoursesList(generics.ListAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
+    permission_classes = [AllowAny]  
 
 
+class UserCreatedCoursesList(generics.ListAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated] 
+
+    def get_queryset(self):
+        return Course.objects.filter(created_by=self.request.user)
+
+class UserEnrolledCoursesList(generics.ListAPIView):
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated] 
+    def get_queryset(self):
+        return Course.objects.filter(enrollments__user=self.request.user)
 
 
 class ModuleCreateView(generics.CreateAPIView):
