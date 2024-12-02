@@ -8,12 +8,15 @@ from .views import (
     AssignmentCreateView,
     AssignmentUpdateView,
     AssignmentListView, QuizCreateView, QuizDetailView, QuizListView,
-      QuizSubmissionView, ResourceCreateView, ResourceListView
+      QuizSubmissionView, ResourceCreateView, ResourceListView,
+      AvailableCoursesList, UserCreatedCoursesList, UserEnrolledCoursesList
 )
 
 urlpatterns = [
     path('create-course/', CourseCreate.as_view(), name='course_create'),
-    path('courses/', CourseList.as_view(), name='course_list'),
+    path('courses/', AvailableCoursesList.as_view(), name='available-courses'),
+    path('courses/created/', UserCreatedCoursesList.as_view(), name='user-created-courses'),
+    path('courses/enrolled/', UserEnrolledCoursesList.as_view(), name='user-enrolled-courses'),
     path('lessons/', LessonListView.as_view(), name='lesson_list'),
     path('create-module/', ModuleCreateView.as_view(), name='module_create'),
     path('update-module/<int:pk>/', ModuleUpdateView.as_view(), name='update_module'),
