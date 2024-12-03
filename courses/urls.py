@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    AssignmentSubmissionCreateView, CertificationDetailView, CertificationListCreateView, CourseCreate, CourseList,
+    AssignmentSubmissionCreateView, CertificationDetailView, CertificationListCreateView, CourseCreate,
     EnrollCourseView, EnrollmentListView, LessonListView,
     LessonProgressUpdateView, 
     ModuleCreateView, 
