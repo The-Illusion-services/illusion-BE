@@ -111,7 +111,12 @@ class CourseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
-        fields = '__all__'
+        fields = [
+            'id', 'course_title', 'course_description', 'created_by',
+            'course_language', 'course_level', 'course_category',
+            'price', 'certification', 'difficulty_level', 'estimated_duration',
+            'created_at', 'updated_at', 'modules'
+        ] 
 
     def create(self, validated_data):
         # Extract modules and lessons from validated data
