@@ -30,16 +30,19 @@ class AvailableCoursesList(generics.ListAPIView):
 
 class UserCreatedCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Course.objects.filter(created_by=self.request.user)
 
+
 class UserEnrolledCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticated] 
+    permission_classes = [IsAuthenticated]
+
     def get_queryset(self):
         return Course.objects.filter(enrollments__user=self.request.user)
+
 
 
 class ModuleCreateView(generics.CreateAPIView):
