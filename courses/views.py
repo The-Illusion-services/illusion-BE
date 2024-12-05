@@ -87,8 +87,8 @@ class ModuleListView(generics.ListAPIView):
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     def get_queryset(self):
-        course_id = self.kwargs.get('course_id')
-        return Module.objects.filter(course_id=course_id)
+        # Return all modules without any filtering
+        return Module.objects.all()
 
 
 
