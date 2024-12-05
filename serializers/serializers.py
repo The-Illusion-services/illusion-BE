@@ -64,7 +64,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Module
-        fields = ['title', 'lessons']
+        fields = ['id', 'title', 'lessons']
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons', [])
