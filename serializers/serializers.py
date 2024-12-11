@@ -75,35 +75,45 @@ class ModuleSerializer(serializers.ModelSerializer):
 
         return module
 
-    def update(self, instance, validated_data):
-        # Pop out the lessons data from validated data
-        lessons_data = validated_data.pop('lessons', [])
+   def update(self, instance, validated_data):
+    # Pop out the lessons data from validated data
+    lessons_data = validated_data.pop('lessons', [])
 
-        # Update module fields
-        instance = super().update(instance, validated_data)
+    # Update module fields
+    for attr, value in validated_data.items():
+        setattr(instance, attr, value)
+    instance.save()
 
-        # Create a list of existing lesson IDs
-        existing_lessons = instance.lessons.all()  # Get all lessons of the module
-        existing_lessons_ids = [lesson.id for lesson in existing_lessons]
+    # Track existing lesson IDs
+    existing_lessons = instance.lessons.all()
+    existing_lessons_ids = set(existing_lessons.values_list('id', flat=True))
 
-        # Process incoming lessons data
-        for lesson_data in lessons_data:
-            lesson_id = lesson_data.get('id', None)
+    # Collect new lesson IDs from the incoming data
+    incoming_lesson_ids = set()
 
-            # Update existing lesson if it's in the module
-            if lesson_id and lesson_id in existing_lessons_ids:
-                lesson_instance = Lesson.objects.get(id=lesson_id, module=instance)
-                LessonSerializer().update(lesson_instance, lesson_data)
+    for lesson_data in lessons_data:
+        lesson_id = lesson_data.get('id')
 
-            # If it's a new lesson (no ID), create it
-            else:
-                Lesson.objects.create(module=instance, **lesson_data)
+        if lesson_id and lesson_id in existing_lessons_ids:
+            # Update existing lesson
+            lesson_instance = existing_lessons.get(id=lesson_id)
+            incoming_lesson_ids.add(lesson_id)
+            for attr, value in lesson_data.items():
+                setattr(lesson_instance, attr, value)
+            lesson_instance.save()
+        else:
+            # Create new lesson
+            lesson_instance = Lesson.objects.create(module=instance, **lesson_data)
+            incoming_lesson_ids.add(lesson_instance.id)
+
+    # Remove lessons not included in the update data
+    lessons_to_delete = existing_lessons.exclude(id__in=incoming_lesson_ids)
+    lessons_to_delete.delete()
+
+    return instance
 
     
-
-        return instance
-
-
+         
 class CourseSerializer(serializers.ModelSerializer):
     created_by = serializers.ReadOnlyField(source='created_by.username')
     modules = ModuleSerializer(many=True, required=False)  # Include modules in the course
