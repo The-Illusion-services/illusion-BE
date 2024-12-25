@@ -76,7 +76,6 @@ class ModuleSerializer(serializers.ModelSerializer):
         return module
 
     def update(self, instance, validated_data):
-        # Pop out the lessons data from validated data
         lessons_data = validated_data.pop('lessons', [])
 
         # Update module fields
