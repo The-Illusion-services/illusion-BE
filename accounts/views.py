@@ -22,6 +22,7 @@ import datetime
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model, authenticate, login
+from django.core.mail import send_mail
 
 
 
@@ -68,6 +69,14 @@ class UserRegistrationView(APIView):
         # Validate and save user
         if serializer.is_valid():
             user = serializer.save()
+
+            send_mail(
+                    'Welcome to Illusion Academy',
+                    f'Dear {user.first_name}, welcome to Illsuion Academy...',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
 
             # Generate tokens for the user
             response_data = {
