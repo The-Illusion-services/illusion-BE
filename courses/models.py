@@ -16,7 +16,7 @@ DIFFICULTY_CHOICES = [
 class Course(models.Model):
     course_title = models.CharField(max_length=200)
     course_description = models.TextField()
-    # course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
+    course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
     course_language = models.CharField(max_length=50, default='English')
     
     
