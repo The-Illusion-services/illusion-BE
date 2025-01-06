@@ -1,13 +1,23 @@
-- removed superadmin role in the account models. reason is that by default, in django, there's a super admin.
-- removed coursetype. Had a call with Silverstone and he said it's not very much needed at this point
-- extend the course models to include images,etc
+# Changelog
 
-- added serializers in one folder 
+All notable changes to Illusion Academy will be documented in this file.
 
-- added a permissions folder too
+## [Unreleased]
+
+### Chore
+- added a send_email function to user registration view. Subsequent changes will be to add email notifications in other fields
+- added course_image back to course model 
+- added email configurations on settings.py
+- configured staticfiles to use whitenoise in production
+- added media and static urls to base urls
+- added whitenoise to requirements file
+
+### Fix
+- 
 
 
-# 22/9/2024
-- changed section to modules
-- changed flow to go with Course-Module-Lesson
-- worked on the assignment feature 
+### Feat
+- 
+
+## [1.0.0] - 06-01-2025
+
