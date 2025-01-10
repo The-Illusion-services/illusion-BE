@@ -74,6 +74,48 @@ class ModuleSerializer(serializers.ModelSerializer):
             Lesson.objects.create(module=module, **lesson_data)  # Create lessons for this module
 
         return module
+    
+    """
+    i will come back to this commented code in case for reference 
+    purpose
+    
+    """
+
+    # def update(self, instance, validated_data):
+    #     lessons_data = validated_data.pop('lessons', [])
+
+    #     # Update module fields
+    #     for attr, value in validated_data.items():
+    #         setattr(instance, attr, value)
+    #     instance.save()
+
+    #     # Track existing lesson IDs
+    #     existing_lessons = instance.lessons.all()
+    #     existing_lessons_ids = set(existing_lessons.values_list('id', flat=True))
+
+    #     # Collect new lesson IDs from the incoming data
+    #     incoming_lesson_ids = set()
+
+    #     for lesson_data in lessons_data:
+    #         lesson_id = lesson_data.get('id')
+
+    #         if lesson_id and lesson_id in existing_lessons_ids:
+    #             # Update existing lesson
+    #             lesson_instance = existing_lessons.get(id=lesson_id)
+    #             incoming_lesson_ids.add(lesson_id)
+    #             for attr, value in lesson_data.items():
+    #                 setattr(lesson_instance, attr, value)
+    #             lesson_instance.save()
+    #         else:
+    #             # Create new lesson
+    #             lesson_instance = Lesson.objects.create(module=instance, **lesson_data)
+    #             incoming_lesson_ids.add(lesson_instance.id)
+
+    #     # Remove lessons not included in the update data
+    #     lessons_to_delete = existing_lessons.exclude(id__in=incoming_lesson_ids)
+    #     lessons_to_delete.delete()
+
+    #     return instance
 
     def update(self, instance, validated_data):
         lessons_data = validated_data.pop('lessons', [])
@@ -87,29 +129,37 @@ class ModuleSerializer(serializers.ModelSerializer):
         existing_lessons = instance.lessons.all()
         existing_lessons_ids = set(existing_lessons.values_list('id', flat=True))
 
-        # Collect new lesson IDs from the incoming data
+        # Collect new lesson IDs and update or create lessons
         incoming_lesson_ids = set()
+        lessons_to_update = []
+        lessons_to_create = []
 
         for lesson_data in lessons_data:
             lesson_id = lesson_data.get('id')
-
-            if lesson_id and lesson_id in existing_lessons_ids:
-                # Update existing lesson
-                lesson_instance = existing_lessons.get(id=lesson_id)
-                incoming_lesson_ids.add(lesson_id)
-                for attr, value in lesson_data.items():
-                    setattr(lesson_instance, attr, value)
-                lesson_instance.save()
+            if lesson_id:
+                if lesson_id in existing_lessons_ids:
+                    # Update existing lesson
+                    lesson_instance = existing_lessons.get(id=lesson_id)
+                    incoming_lesson_ids.add(lesson_id)
+                    for attr, value in lesson_data.items():
+                        setattr(lesson_instance, attr, value)
+                    lessons_to_update.append(lesson_instance)
+                else:
+                    raise ValueError(f"Invalid lesson ID: {lesson_id}")
             else:
-                # Create new lesson
-                lesson_instance = Lesson.objects.create(module=instance, **lesson_data)
-                incoming_lesson_ids.add(lesson_instance.id)
+                # Prepare new lesson
+                lessons_to_create.append(Lesson(module=instance, **lesson_data))
+
+        # Perform bulk updates and creates
+        Lesson.objects.bulk_update(lessons_to_update, fields=[field.name for field in Lesson._meta.fields if field.name != 'id'])
+        Lesson.objects.bulk_create(lessons_to_create)
 
         # Remove lessons not included in the update data
         lessons_to_delete = existing_lessons.exclude(id__in=incoming_lesson_ids)
         lessons_to_delete.delete()
 
         return instance
+
 
     
          
@@ -122,7 +172,7 @@ class CourseSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
         fields = [
             'id', 'course_title', 'course_description', 'created_by',
-            'course_language', 'course_level', 'course_image', 'course_category',
+            'course_language', 'course_level', 'course_image', 'course_video', 'course_banner', 'course_category',
             'price', 'certification', 'difficulty_level', 'estimated_duration',
             'created_at', 'updated_at', 'modules'
         ] 
@@ -205,7 +255,7 @@ class QuizSubmissionSerializer(serializers.ModelSerializer):
 class ResourceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Resource
-        fields = ['id', 'lesson', 'module', 'resource_title', 'resource_link']
+        fields = ['id', 'lesson', 'module', 'resource_title', 'resource_link', 'file_upload']
 
 
 class CertificationSerializer(serializers.ModelSerializer):
