@@ -27,19 +27,19 @@ class AvailableCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
     permission_classes = [AllowAny] 
 
-class CourseDeleteView(generics.RetrieveDestroyAPIView):
-    queryset = Course.objects.all()
-    serializer_class = CourseSerializer
+# class CourseDeleteView(generics.RetrieveDestroyAPIView):
+#     queryset = Course.objects.all()
+#     serializer_class = CourseSerializer
 
-    def delete(self, request, *args, **kwargs):
-        # Get the course instance
-        course = self.get_object()
+#     def delete(self, request, *args, **kwargs):
+#         # Get the course instance
+#         course = self.get_object()
         
-        # Delete the course
-        course.delete()
+#         # Delete the course
+#         course.delete()
         
-        # Return success response
-        return Response({"message": "Course deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+#         # Return success response
+#         return Response({"message": "Course deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
 
 class UserCreatedCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
