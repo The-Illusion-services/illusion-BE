@@ -76,7 +76,7 @@ class Lesson(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} Lesson - from {self.course} - created by {self.course}"
+        return f"{self.title} Lesson - from {self.module.course.course_title} - created by {self.module.course.created_by.username}- created at {self.module.course.created_at}"
 
 class Resource(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
