@@ -54,9 +54,11 @@ class GoogleSignUpSerializer(serializers.Serializer):
 
 
 class LessonSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(required=False)  # Allow id to be writable
+
     class Meta:
         model = Lesson
-        fields = '__all__'
+        fields = ['id', 'title', 'description', 'is_published']
 
 
 class ModuleSerializer(serializers.ModelSerializer):
@@ -65,6 +67,14 @@ class ModuleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Module
         fields = ['id', 'title', 'lessons']
+
+    def validate_lessons(self, value):
+        request_method = self.context['request'].method
+        if request_method == 'PATCH':
+            for lesson in value:
+                if 'id' not in lesson:
+                    raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
+        return value
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons', [])
@@ -80,88 +90,65 @@ class ModuleSerializer(serializers.ModelSerializer):
     purpose
     
     """
-
-    # def update(self, instance, validated_data):
-    #     lessons_data = validated_data.pop('lessons', [])
-
-    #     # Update module fields
-    #     for attr, value in validated_data.items():
-    #         setattr(instance, attr, value)
-    #     instance.save()
-
-    #     # Track existing lesson IDs
-    #     existing_lessons = instance.lessons.all()
-    #     existing_lessons_ids = set(existing_lessons.values_list('id', flat=True))
-
-    #     # Collect new lesson IDs from the incoming data
-    #     incoming_lesson_ids = set()
-
-    #     for lesson_data in lessons_data:
-    #         lesson_id = lesson_data.get('id')
-
-    #         if lesson_id and lesson_id in existing_lessons_ids:
-    #             # Update existing lesson
-    #             lesson_instance = existing_lessons.get(id=lesson_id)
-    #             incoming_lesson_ids.add(lesson_id)
-    #             for attr, value in lesson_data.items():
-    #                 setattr(lesson_instance, attr, value)
-    #             lesson_instance.save()
-    #         else:
-    #             # Create new lesson
-    #             lesson_instance = Lesson.objects.create(module=instance, **lesson_data)
-    #             incoming_lesson_ids.add(lesson_instance.id)
-
-    #     # Remove lessons not included in the update data
-    #     lessons_to_delete = existing_lessons.exclude(id__in=incoming_lesson_ids)
-    #     lessons_to_delete.delete()
-
-    #     return instance
-
     def update(self, instance, validated_data):
+        request_method = self.context['request'].method
+
+
+        # Get the existing lessons
+        existing_lessons = instance.lessons.all()
+
+        # Process the incoming lessons data
         lessons_data = validated_data.pop('lessons', [])
 
-        # Update module fields
+        # Create a dictionary to store the updated lessons
+        updated_lessons = {}
+
+        if request_method == 'PATCH':
+            for lesson_data in lessons_data:
+                lesson_id = lesson_data.get('id')
+                if not lesson_id:
+                    raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
+
+                # Update an existing lesson
+                lesson_instance = existing_lessons.filter(id=lesson_id).first()
+                if lesson_instance:
+                    for attr, value in lesson_data.items():
+                        setattr(lesson_instance, attr, value)
+                    updated_lessons[lesson_id] = lesson_instance
+                else:
+                    raise serializers.ValidationError({"id": f"Lesson with id {lesson_id} does not exist."})
+
+        elif request_method == 'PUT':
+            for lesson_data in lessons_data:
+                lesson_id = lesson_data.get('id')
+                if lesson_id:
+                    # Update an existing lesson
+                    lesson_instance = existing_lessons.filter(id=lesson_id).first()
+                    if lesson_instance:
+                        for attr, value in lesson_data.items():
+                            setattr(lesson_instance, attr, value)
+                        updated_lessons[lesson_id] = lesson_instance
+                    else:
+                        raise serializers.ValidationError({"id": f"Lesson with id {lesson_id} does not exist."})
+                else:
+                    # Create a new lesson
+                    lesson_data['module'] = instance
+                    new_lesson = Lesson(**lesson_data)
+                    new_lesson.save()
+                    updated_lessons[new_lesson.id] = new_lesson
+
+        # Save updated lessons
+        for lesson_id, lesson_instance in updated_lessons.items():
+            lesson_instance.save()
+
+        # Update the module fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
 
-        # Track existing lesson IDs
-        existing_lessons = instance.lessons.all()
-        existing_lessons_ids = set(existing_lessons.values_list('id', flat=True))
-
-        # Collect new lesson IDs and update or create lessons
-        incoming_lesson_ids = set()
-        lessons_to_update = []
-        lessons_to_create = []
-
-        for lesson_data in lessons_data:
-            lesson_id = lesson_data.get('id')
-            if lesson_id:
-                if lesson_id in existing_lessons_ids:
-                    # Update existing lesson
-                    lesson_instance = existing_lessons.get(id=lesson_id)
-                    incoming_lesson_ids.add(lesson_id)
-                    for attr, value in lesson_data.items():
-                        setattr(lesson_instance, attr, value)
-                    lessons_to_update.append(lesson_instance)
-                else:
-                    raise ValueError(f"Invalid lesson ID: {lesson_id}")
-            else:
-                # Prepare new lesson
-                lessons_to_create.append(Lesson(module=instance, **lesson_data))
-
-        # Perform bulk updates and creates
-        Lesson.objects.bulk_update(lessons_to_update, fields=[field.name for field in Lesson._meta.fields if field.name != 'id'])
-        Lesson.objects.bulk_create(lessons_to_create)
-
-        # Remove lessons not included in the update data
-        lessons_to_delete = existing_lessons.exclude(id__in=incoming_lesson_ids)
-        lessons_to_delete.delete()
-
         return instance
 
 
-    
          
 class CourseSerializer(serializers.ModelSerializer):
     created_by = serializers.ReadOnlyField(source='created_by.username')
