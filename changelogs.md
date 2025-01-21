@@ -5,7 +5,8 @@ All notable changes to Illusion Academy will be documented in this file.
 ## [Unreleased]
 
 ### Chore
-- changed db to prod 
+- changed db to prod
+- made resource_link optional for users to use via the `blank=True` call
 
 ### Fix
 - 
