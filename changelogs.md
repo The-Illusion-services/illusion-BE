@@ -6,7 +6,8 @@ All notable changes to Illusion Academy will be documented in this file.
 
 ### Chore
 - changed db to prod
-- made resource_link optional for users to use via the `blank=True` call
+- made resource_link optional for users to use via the `blank=True` 
+- changed `description` to `content` on Lesson model
 
 ### Fix
 - 
