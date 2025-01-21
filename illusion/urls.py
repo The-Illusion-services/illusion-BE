@@ -15,7 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from rest_framework_swagger.views import get_swagger_view
 from django.conf.urls.static import static
 from drf_yasg.views import get_schema_view
@@ -33,9 +33,15 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("api/v1/auth/", include("dj_rest_auth.urls")),
+    re_path(r"^api/v1/auth/accounts/", include("allauth.urls")),
     path('api/', include('accounts.urls')),
     path('api/', include('courses.urls')),
     path('docs/', schema_view.with_ui('swagger', cache_timeout=0),name='schema-swagger-ui'),
 
 
-] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+] 
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

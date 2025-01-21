@@ -1,13 +1,18 @@
-- removed superadmin role in the account models. reason is that by default, in django, there's a super admin.
-- removed coursetype. Had a call with Silverstone and he said it's not very much needed at this point
-- extend the course models to include images,etc
+# Changelog
 
-- added serializers in one folder 
+All notable changes to Illusion Academy will be documented in this file.
 
-- added a permissions folder too
+## [Unreleased]
+
+### Chore
+- changed db to prod 
+
+### Fix
+- 
 
 
-# 22/9/2024
-- changed section to modules
-- changed flow to go with Course-Module-Lesson
-- worked on the assignment feature 
+### Feat
+- 
+
+## [1.0.0] - 21-01-2025
+

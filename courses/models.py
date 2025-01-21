@@ -16,7 +16,10 @@ DIFFICULTY_CHOICES = [
 class Course(models.Model):
     course_title = models.CharField(max_length=200)
     course_description = models.TextField()
-    # course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
+    course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
+    course_video = models.FileField(upload_to='course_videos/', blank=True, null=True)
+    course_banner = models.ImageField(upload_to='course_banners/', blank=True, null=True)
+
     course_language = models.CharField(max_length=50, default='English')
     
     
@@ -73,13 +76,16 @@ class Lesson(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} Lesson - from {self.course} - created by {self.course}"
+        return f"{self.title} Lesson - from {self.module.course.course_title} - created by {self.module.course.created_by.username}- created at {self.module.course.created_at}"
 
 class Resource(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
     resource_title = models.CharField(max_length=255)
     resource_link = models.URLField()
+    file_upload = models.FileField(upload_to='resource_files/', blank=True, null=True)
+
+
 
     def __str__(self):
         return f"Resource: {self.resource_title}"

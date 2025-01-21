@@ -12,8 +12,15 @@ router.register(r'applications', ApplicationViewSet)
 urlpatterns = [
     path('login/', LoginAPIView.as_view(), name='login'),
     path('register/', UserRegistrationView.as_view(), name='register'),
-    path('google-signup/', GoogleSignUpView.as_view(), name='google-signup'),
-    # path('google-login/', GoogleLogin.as_view(), name='google-login'),
+    path("glogin/", LoginPage.as_view(), name="login"),
+    
+    path("v1/auth/google/", GoogleLogin.as_view(), name="google_login"),
+    path(
+        "v1/auth/google/callback/",
+        GoogleLoginCallback.as_view(),
+        name="google_login_callback",
+    ),
+
     path('protected/', ProtectedView.as_view(), name='protected-view'),
 
     path('profile/', ProfileView.as_view(), name='profile'),

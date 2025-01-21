@@ -1,4 +1,5 @@
 from django.shortcuts import render
+from django.views import View
 from accounts.serializers import ProfileSerializer
 from permissions import permissions
 from drf_yasg import openapi
@@ -22,6 +23,13 @@ import datetime
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import get_user_model, authenticate, login
+from django.core.mail import send_mail
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
+from urllib.parse import urljoin
+import requests
+from django.urls import reverse
 
 
 
@@ -68,6 +76,14 @@ class UserRegistrationView(APIView):
         # Validate and save user
         if serializer.is_valid():
             user = serializer.save()
+
+            send_mail(
+                    'Welcome to Illusion Academy',
+                    f'Dear {user.first_name}, welcome to Illusion Academy...',
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                )
 
             # Generate tokens for the user
             response_data = {
@@ -121,20 +137,40 @@ class LoginAPIView(APIView):
         return Response(response_data, status=status.HTTP_200_OK)
 
 
-class GoogleSignUpView(APIView):
-    def post(self, request):
-        serializer = GoogleSignUpSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
 
-        user = serializer.save()
 
-        # Generate JWT token
-        refresh = RefreshToken.for_user(user)
-        return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }, status=status.HTTP_200_OK)
+class GoogleLogin(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = settings.GOOGLE_OAUTH_CALLBACK_URL
+    client_class = OAuth2Client
 
+
+class GoogleLoginCallback(APIView):
+    def get(self, request, *args, **kwargs):
+       
+
+        code = request.GET.get("code")
+
+        if code is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+        
+        # Remember to replace the localhost:8000 with the actual domain name before deployment
+        token_endpoint_url = urljoin("http://localhost:8000", reverse("google_login"))
+        response = requests.post(url=token_endpoint_url, data={"code": code})
+
+        return Response(response.json(), status=status.HTTP_200_OK)
+
+# for testing the oauth flow
+class LoginPage(View):
+    def get(self, request, *args, **kwargs):
+        return render(
+            request,
+            "pages/login.html",
+            {
+                "google_callback_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,
+                "google_client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
+            },
+        )
 
 
 class ProtectedView(APIView):
