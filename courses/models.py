@@ -82,7 +82,7 @@ class Resource(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="resources", null=True, blank=True)
     resource_title = models.CharField(max_length=255)
-    resource_link = models.URLField()
+    resource_link = models.URLField(blank=True, null=True)
     file_upload = models.FileField(upload_to='resource_files/', blank=True, null=True)
 
 
