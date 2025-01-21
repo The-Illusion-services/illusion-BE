@@ -5,7 +5,7 @@ All notable changes to Illusion Academy will be documented in this file.
 ## [Unreleased]
 
 ### Chore
-- 
+- created UIs to test the Google OAuth flow
 
 ### Fix
 - 
