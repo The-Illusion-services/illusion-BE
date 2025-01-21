@@ -16,8 +16,8 @@ DIFFICULTY_CHOICES = [
 class Course(models.Model):
     course_title = models.CharField(max_length=200)
     course_description = models.TextField()
-    course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
-    course_video = models.FileField(upload_to='course_videos/', blank=True, null=True)
+    # course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
+    # course_video = models.FileField(upload_to='course_videos/', blank=True, null=True)
     course_banner = models.ImageField(upload_to='course_banners/', blank=True, null=True)
 
     course_language = models.CharField(max_length=50, default='English')
@@ -71,7 +71,9 @@ class Module(models.Model):
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, null=True, related_name='lessons')
     title = models.CharField(max_length=200, default='')
-    description = models.TextField(default="")
+    content = models.TextField(default="", blank=True,)
+    lesson_resource = models.URLField(blank=True, null=True)
+    lesson_file = models.FileField(upload_to='lesson_files/', blank=True, null=True)
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
