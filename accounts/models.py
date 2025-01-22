@@ -15,7 +15,6 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(unique=True)
-    company = models.CharField(max_length=200, default='')
     role = models.CharField(max_length=200, choices=ROLE_CHOICES)
     password = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
