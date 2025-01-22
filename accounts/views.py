@@ -49,7 +49,6 @@ class UserRegistrationView(APIView):
                 'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
                 'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
                 'confirm_password': openapi.Schema(type=openapi.TYPE_STRING, description='Confirm Password'),
-                'company': openapi.Schema(type=openapi.TYPE_STRING, description='Company'),
                 'role': openapi.Schema(type=openapi.TYPE_STRING, enum=['Employee', 'Employer'], description='Role'),
             },
             required=['first_name', 'last_name', 'email', 'password', 'confirm_password', 'role'],
@@ -69,7 +68,6 @@ class UserRegistrationView(APIView):
             'last_name': data['last_name'],
             'email': data['email'],
             'password': data['password'],
-            'company': data.get('company', ''),
             'role': data['role']
         })
 
