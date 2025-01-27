@@ -11,6 +11,7 @@ All notable changes to Illusion Academy will be documented in this file.
 - delete difficulty level in course model
 - changed roles and permission to learner and creator
 - removed `difficulty_level` in `CourseSerializer
+- changed `lesson_file` and `course_banner` to use `URLField`
 
 
 ### Feat

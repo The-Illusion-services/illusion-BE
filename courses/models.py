@@ -12,7 +12,7 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class Course(models.Model):
     course_title = models.CharField(max_length=200)
     course_description = models.TextField()
-    course_banner = models.ImageField(upload_to='course_banners/', blank=True, null=True)
+    course_banner = models.URLField(blank=True, null=True)
 
     course_language = models.CharField(max_length=50, default='English')
     
@@ -53,6 +53,8 @@ class Course(models.Model):
     def __str__(self):
         return f"{self.course_title} - {self.created_by}"
 
+
+
 class Module(models.Model):
     title=models.CharField(max_length=200)
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
@@ -66,7 +68,7 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200, default='')
     content = models.TextField(default="", blank=True,)
     lesson_resource = models.URLField(blank=True, null=True)
-    lesson_file = models.FileField(upload_to='lesson_files/', blank=True, null=True)
+    lesson_file = models.URLField(blank=True, null=True)
     is_published = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
