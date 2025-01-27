@@ -10,6 +10,7 @@ All notable changes to Illusion Academy will be documented in this file.
 ### Fix
 - delete difficulty level in course model
 - changed roles and permission to learner and creator
+- removed `difficulty_level` in `CourseSerializer
 
 
 ### Feat
