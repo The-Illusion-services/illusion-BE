@@ -29,6 +29,60 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 
+class AnswerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Answer
+        fields = ['id', 'answer_text', 'is_correct']
+
+    def to_representation(self, instance):
+        """Override to conditionally exclude the 'is_correct' field."""
+        representation = super().to_representation(instance)
+        
+        # Check if the request is from an admin or the course creator
+        request = self.context.get('request')
+        if request and (request.user.is_staff or request.user == instance.question.quiz.module.course.created_by):
+            # Expose 'is_correct' for admins or course creators
+            return representation
+        else:
+            # Hide 'is_correct' for regular users
+            representation.pop('is_correct', None)
+            return representation
+
+class QuestionSerializer(serializers.ModelSerializer):
+    answers = AnswerSerializer(many=True)
+
+    class Meta:
+        model = Question
+        fields = ['id', 'question_text', 'answers']
+
+    def get_fields(self):
+        """Pass the request context to the AnswerSerializer."""
+        fields = super().get_fields()
+        request = self.context.get('request')
+        fields['answers'].context.update({'request': request})
+        return fields
+
+
+class QuizSubmissionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = QuizSubmission
+        fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
+    
+class QuizSerializer(serializers.ModelSerializer):
+    questions = QuestionSerializer(many=True)
+
+
+    class Meta:
+        model = Quiz
+        fields = ['id', 'title', 'questions', 'created_at']
+
+    def get_fields(self):
+        """Pass the request context to the QuestionSerializer."""
+        fields = super().get_fields()
+        request = self.context.get('request')
+        fields['questions'].context.update({'request': request})
+        return fields
+         
 
 
 
@@ -42,10 +96,10 @@ class LessonSerializer(serializers.ModelSerializer):
 
 class ModuleSerializer(serializers.ModelSerializer):
     lessons = LessonSerializer(many=True, required=False)  # Include lessons in the module
-
+    quizzes = QuizSerializer(many=True, required=False)
     class Meta:
         model = Module
-        fields = ['id', 'title', 'lessons']
+        fields = ['id', 'title', 'lessons', 'quizzes']
 
     def validate_lessons(self, value):
         request_method = self.context['request'].method
@@ -128,40 +182,62 @@ class ModuleSerializer(serializers.ModelSerializer):
         return instance
 
 
-         
+
+
 class CourseSerializer(serializers.ModelSerializer):
-    created_by = serializers.ReadOnlyField(source='created_by.username')
+    created_by = serializers.SerializerMethodField() 
     modules = ModuleSerializer(many=True, required=False)  # Include modules in the course
 
     class Meta:
         model = Course
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
         fields = [
-            'id', 'course_title', 'course_description', 'created_by',
+            'id', 'course_title', 'course_description', 
             'course_language', 'course_level', 'course_banner', 'course_category',
-            'price', 'certification', 'estimated_duration',
-            'created_at', 'updated_at', 'modules'
-        ] 
+            'price', 'certification', 'estimated_duration', 'created_by',
+            'created_at', 'updated_at', 'modules', 
+        ]
 
     def create(self, validated_data):
-        # Extract modules and lessons from validated data
-        modules_data = validated_data.pop('modules', [])  # Extract modules data if any
-        
-        # Create the course first
-        course = Course.objects.create(**validated_data)  # Save the course
-        
-        # Now, handle creating modules and lessons
-        for module_data in modules_data:
-            lessons_data = module_data.pop('lessons', [])  # Extract lessons if any
-            
-            # Create each module, associate it with the course
-            module = Module.objects.create(course=course, **module_data)
+            # Extract modules data from the validated data
+            modules_data = validated_data.pop('modules', [])
 
-            # Create lessons for each module if any lessons provided
-            for lesson_data in lessons_data:
-                Lesson.objects.create(module=module, **lesson_data)
+            # Create the course
+            course = Course.objects.create(**validated_data)
 
-        return course
+            # Create modules, lessons, quizzes, questions, and answers
+            for module_data in modules_data:
+                lessons_data = module_data.pop('lessons', [])
+                quizzes_data = module_data.pop('quizzes', [])
+
+                # Create the module
+                module = Module.objects.create(course=course, **module_data)
+
+                # Create lessons for the module
+                for lesson_data in lessons_data:
+                    Lesson.objects.create(module=module, **lesson_data)
+
+                # Create quizzes for the module
+                for quiz_data in quizzes_data:
+                    questions_data = quiz_data.pop('questions', [])
+                    quiz = Quiz.objects.create(module=module, **quiz_data)
+
+                    # Create questions for the quiz
+                    for question_data in questions_data:
+                        answers_data = question_data.pop('answers', [])
+                        question = Question.objects.create(quiz=quiz, **question_data)
+
+                        # Create answers for the question
+                        for answer_data in answers_data:
+                            Answer.objects.create(question=question, **answer_data)
+
+            return course
+    
+    def get_created_by(self, obj):
+        """Return the first name and last name of the creator."""
+        if obj.created_by:
+            return f"{obj.created_by.first_name} {obj.created_by.last_name}"
+        return None  
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
@@ -193,29 +269,6 @@ class LessonProgressSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class AnswerSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Answer
-        fields = ['id', 'answer_text', 'is_correct']
-
-class QuestionSerializer(serializers.ModelSerializer):
-    answers = AnswerSerializer(many=True)
-
-    class Meta:
-        model = Question
-        fields = ['id', 'question_text', 'answers']
-
-class QuizSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True)
-
-    class Meta:
-        model = Quiz
-        fields = ['id', 'title', 'questions', 'created_by', 'created_at']
-
-class QuizSubmissionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = QuizSubmission
-        fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
 
 
 class ResourceSerializer(serializers.ModelSerializer):

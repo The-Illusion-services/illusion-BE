@@ -85,7 +85,43 @@ class Resource(models.Model):
     def __str__(self):
         return f"Resource: {self.resource_title}"
 
+
+class Quiz(models.Model):
+    title = models.CharField(max_length=255)
+    module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE, related_name="quizzes")  # Updated to Module
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Quiz: {self.title} for {self.module.course.course_title}"
+
+
+class Question(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
+    question_text = models.TextField()
+
+    def __str__(self):
+        return f"Question: {self.question_text}"
+
+
+class Answer(models.Model):
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
+    answer_text = models.CharField(max_length=255)
+    is_correct = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Answer: {self.answer_text} (Correct: {self.is_correct})"
+
+class QuizSubmission(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    score = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
+
+    def __str__(self):
+        return f"Submission by {self.user.username} for Quiz {self.quiz.title}"
     
+
+
 class Assignment(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
@@ -150,45 +186,6 @@ class LessonProgressTracker(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s progress on {self.lesson.title}"
-
-
-
-
-
-
-class Quiz(models.Model):
-    title = models.CharField(max_length=255)
-    course = models.ForeignKey(Course, default=False, on_delete=models.CASCADE, related_name="quizzes")
-    created_by = models.ForeignKey(User, default=False, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Quiz: {self.title} for {self.course.course_title}"
-
-class Question(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
-    question_text = models.TextField()
-
-    def __str__(self):
-        return f"Question: {self.question_text}"
-
-class Answer(models.Model):
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
-    answer_text = models.CharField(max_length=255)
-    is_correct = models.BooleanField(default=False)
-
-    def __str__(self):
-        return f"Answer: {self.answer_text} (Correct: {self.is_correct})"
-
-class QuizSubmission(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    submitted_at = models.DateTimeField(auto_now_add=True)
-    score = models.FloatField(validators=[MinValueValidator(0), MaxValueValidator(100)])
-
-    def __str__(self):
-        return f"Submission by {self.user.username} for Quiz {self.quiz.title}"
-
 
 
 

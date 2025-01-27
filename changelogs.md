@@ -14,7 +14,7 @@ All notable changes to Illusion Academy will be documented in this file.
 
 
 ### Feat
-- 
+- added Quiz feature to Modules
 
 ## [1.0.0] - 27-01-2025
 
