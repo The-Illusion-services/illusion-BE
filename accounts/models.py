@@ -5,8 +5,8 @@ import uuid
 
 
 ROLE_CHOICES = [
-   ( 'Employee', 'Employee'),
-   ('Employer', 'Employer'),
+   ( 'Learner', 'Learner'),
+   ('Creator', 'Creator'),
    
 ]
 

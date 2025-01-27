@@ -7,17 +7,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 # Create your models here.
 
 
-DIFFICULTY_CHOICES = [
-        ('beginner', 'Beginner'),
-        ('intermediate', 'Intermediate'),
-        ('advanced', 'Advanced'),
-    ]
+
 
 class Course(models.Model):
     course_title = models.CharField(max_length=200)
     course_description = models.TextField()
-    # course_image = models.ImageField(upload_to='course_images/', blank=True, null=True)
-    # course_video = models.FileField(upload_to='course_videos/', blank=True, null=True)
     course_banner = models.ImageField(upload_to='course_banners/', blank=True, null=True)
 
     course_language = models.CharField(max_length=50, default='English')
@@ -49,7 +43,6 @@ class Course(models.Model):
    
     certification = models.BooleanField(default=False)
 
-    difficulty_level = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='beginner')
     estimated_duration = models.IntegerField(help_text="Estimated duration in hours", default=1)
     
     # Tracking creation and updates

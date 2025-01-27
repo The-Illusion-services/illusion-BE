@@ -171,6 +171,7 @@ class LoginPage(View):
         )
 
 
+
 class ProtectedView(APIView):
     permission_classes = [IsAuthenticated]
 
