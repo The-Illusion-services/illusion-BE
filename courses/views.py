@@ -7,15 +7,16 @@ from rest_framework.exceptions import PermissionDenied
 # Create your views here.
 from rest_framework import generics
 from serializers.serializers import *
-from permissions.permissions import IsEmployee, IsEmployer 
+from permissions.permissions import IsLearner, IsCreator 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
+
 
 
 
 class CourseCreate(generics.CreateAPIView):
     queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployer]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCreator]
 
     def perform_create(self, serializer):
         # Pass the request user to the serializer
@@ -61,7 +62,7 @@ class UserEnrolledCoursesList(generics.ListAPIView):
 class ModuleCreateView(generics.CreateAPIView):
     queryset = Module.objects.all()
     serializer_class = ModuleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployer]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCreator]
 
     def perform_create(self, serializer):
         # Get the course ID from the request data
@@ -82,7 +83,7 @@ class ModuleCreateView(generics.CreateAPIView):
 class ModuleUpdateView(generics.UpdateAPIView):
     queryset = Module.objects.all()
     serializer_class = ModuleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployer]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCreator]
 
     def perform_update(self, serializer):
         # Get the module to update
@@ -117,7 +118,7 @@ class LessonListView(generics.ListAPIView):
 class AssignmentCreateView(generics.CreateAPIView):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployer]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCreator]
 
     def perform_create(self, serializer):
         # Get the course ID from the request data
@@ -138,7 +139,7 @@ class AssignmentCreateView(generics.CreateAPIView):
 class AssignmentUpdateView(generics.UpdateAPIView):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployer]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsCreator]
 
     def perform_update(self, serializer):
         assignment = self.get_object()
@@ -165,7 +166,7 @@ class AssignmentListView(generics.ListAPIView):
 class EnrollCourseView(generics.CreateAPIView):
     queryset = Enrollment.objects.all()
     serializer_class = EnrollmentSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployee]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsLearner]
 
     def create(self, request, *args, **kwargs):
         course = get_object_or_404(Course, id=request.data.get('course'))
@@ -204,7 +205,7 @@ class EnrollmentListView(generics.ListAPIView):
 class AssignmentSubmissionCreateView(generics.CreateAPIView):
     queryset = AssignmentSubmission.objects.all()
     serializer_class = AssignmentSubmissionSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly, IsEmployee]
+    permission_classes = [IsAuthenticatedOrReadOnly, IsLearner]
 
     def perform_create(self, serializer):
         assignment = get_object_or_404(Assignment, id=self.request.data.get('assignment'))
@@ -214,7 +215,7 @@ class AssignmentSubmissionCreateView(generics.CreateAPIView):
 class LessonProgressUpdateView(generics.UpdateAPIView):
     queryset = LessonProgressTracker.objects.all()
     serializer_class = LessonProgressSerializer
-    permission_classes = [IsAuthenticated, IsEmployee]
+    permission_classes = [IsAuthenticated, IsLearner]
 
     def perform_update(self, serializer):
         progress = self.get_object()
@@ -229,7 +230,7 @@ class LessonProgressUpdateView(generics.UpdateAPIView):
 class QuizCreateView(generics.CreateAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
-    permission_classes = [IsAuthenticated, IsEmployer]  # Ensure only employers can create quizzes
+    permission_classes = [IsAuthenticated, IsCreator]  # Ensure only employers can create quizzes
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -247,7 +248,7 @@ class QuizDetailView(generics.RetrieveAPIView):
 class QuizSubmissionView(generics.CreateAPIView):
     queryset = QuizSubmission.objects.all()
     serializer_class = QuizSubmissionSerializer
-    permission_classes = [IsAuthenticated, IsEmployee]
+    permission_classes = [IsAuthenticated, IsLearner]
 
     def perform_create(self, serializer):
         quiz = get_object_or_404(Quiz, id=self.request.data.get('quiz'))
@@ -299,7 +300,7 @@ class ResourceListView(generics.ListAPIView):
 class ResourceCreateView(generics.CreateAPIView):
     queryset = Resource.objects.all()
     serializer_class = ResourceSerializer
-    permission_classes = [IsAuthenticated, IsEmployer]
+    permission_classes = [IsAuthenticated, IsCreator]
 
     def perform_create(self, serializer):
         lesson_id = self.request.data.get('lesson')
