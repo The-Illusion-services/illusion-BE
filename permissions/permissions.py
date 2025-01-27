@@ -1,10 +1,10 @@
 from rest_framework.permissions import BasePermission
 
-class IsEmployer(BasePermission):
+class IsCreator(BasePermission):
     def has_permission(self, request, view):
-        # Check if the user is authenticated and their role is 'Employer'
-        return request.user.is_authenticated and request.user.role == 'Employer'
+        # Check if the user is authenticated and their role is 'Creator'
+        return request.user.is_authenticated and request.user.role == 'Creator'
 
-class IsEmployee(BasePermission):
+class IsLearner(BasePermission):
     def has_permission(self, request, view):
-        return request.user.is_authenticated and request.user.role == 'Employee'
+        return request.user.is_authenticated and request.user.role == 'Learner'
