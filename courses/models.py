@@ -152,10 +152,6 @@ class LessonProgressTracker(models.Model):
         return f"{self.user.username}'s progress on {self.lesson.title}"
 
 
-
-
-
-
 class Quiz(models.Model):
     title = models.CharField(max_length=255)
     course = models.ForeignKey(Course, default=False, on_delete=models.CASCADE, related_name="quizzes")

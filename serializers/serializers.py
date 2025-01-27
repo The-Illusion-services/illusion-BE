@@ -130,7 +130,7 @@ class ModuleSerializer(serializers.ModelSerializer):
 
          
 class CourseSerializer(serializers.ModelSerializer):
-    created_by = serializers.ReadOnlyField(source='created_by.username')
+    created_by = serializers.SerializerMethodField()  
     modules = ModuleSerializer(many=True, required=False)  # Include modules in the course
 
     class Meta:
@@ -141,7 +141,7 @@ class CourseSerializer(serializers.ModelSerializer):
             'course_language', 'course_level', 'course_banner', 'course_category',
             'price', 'certification', 'estimated_duration',
             'created_at', 'updated_at', 'modules'
-        ] 
+        ]
 
     def create(self, validated_data):
         # Extract modules and lessons from validated data
@@ -162,7 +162,12 @@ class CourseSerializer(serializers.ModelSerializer):
                 Lesson.objects.create(module=module, **lesson_data)
 
         return course
-
+    
+    def get_created_by(self, obj):
+        """Return the first name and last name of the creator."""
+        if obj.created_by:
+            return f"{obj.created_by.first_name} {obj.created_by.last_name}"
+        return None  # Handle cases where created_by might be null
 
 class EnrollmentSerializer(serializers.ModelSerializer):
     user = serializers.ReadOnlyField(source='user.username')
