@@ -8,14 +8,11 @@ All notable changes to Illusion Academy will be documented in this file.
 - 
 
 ### Fix
-- delete difficulty level in course model
-- changed roles and permission to learner and creator
-- removed `difficulty_level` in `CourseSerializer
-- changed `lesson_file` and `course_banner` to use `URLField`
+- configured `Quiz` to follow schema provided
 
 
 ### Feat
-- added Quiz feature to Modules
+- 
 
-## [1.0.0] - 27-01-2025
+## [1.0.0] - 28-01-2025
 

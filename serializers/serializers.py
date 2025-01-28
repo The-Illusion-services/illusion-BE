@@ -67,22 +67,48 @@ class QuizSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizSubmission
         fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
-    
-class QuizSerializer(serializers.ModelSerializer):
-    questions = QuestionSerializer(many=True)
 
+
+class QuizSerializer(serializers.ModelSerializer):
+    options = serializers.ListField(
+        child=serializers.DictField(),
+        required=False  # Options are not mandatory
+    )
 
     class Meta:
         model = Quiz
-        fields = ['id', 'title', 'questions', 'created_at']
+        fields = ['id', 'title', 'options', 'created_at']
 
-    def get_fields(self):
-        """Pass the request context to the QuestionSerializer."""
-        fields = super().get_fields()
-        request = self.context.get('request')
-        fields['questions'].context.update({'request': request})
-        return fields
-         
+    def to_representation(self, instance):
+        """Transform the response to include options."""
+        representation = super().to_representation(instance)
+        representation['options'] = [
+            {
+                "id": answer.id,
+                "text": answer.answer_text,
+                "isCorrect": answer.is_correct,
+            }
+            for question in instance.questions.all()
+            for answer in question.answers.all()
+        ]
+        return representation
+
+    def create(self, validated_data):
+        """Create a quiz along with nested questions and answers."""
+        options = validated_data.pop('options', [])
+        quiz = Quiz.objects.create(**validated_data)
+
+        # Create a single question with the provided options
+        question = Question.objects.create(quiz=quiz, question_text="Default Question")
+        for option in options:
+            Answer.objects.create(
+                question=question,
+                answer_text=option['text'],
+                is_correct=option.get('isCorrect', False),
+            )
+
+        return quiz
+
 
 
 
@@ -95,8 +121,9 @@ class LessonSerializer(serializers.ModelSerializer):
 
 
 class ModuleSerializer(serializers.ModelSerializer):
-    lessons = LessonSerializer(many=True, required=False)  # Include lessons in the module
-    quizzes = QuizSerializer(many=True, required=False)
+    lessons = LessonSerializer(many=True, required=False)
+    quizzes = QuizSerializer(many=True, required=False)  # Use the updated QuizSerializer
+
     class Meta:
         model = Module
         fields = ['id', 'title', 'lessons', 'quizzes']
@@ -111,68 +138,71 @@ class ModuleSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons', [])
-        module = Module.objects.create(**validated_data)  # Create the module
+        quizzes_data = validated_data.pop('quizzes', [])
+        module = Module.objects.create(**validated_data)
 
         for lesson_data in lessons_data:
-            Lesson.objects.create(module=module, **lesson_data)  # Create lessons for this module
+            Lesson.objects.create(module=module, **lesson_data)
+
+        for quiz_data in quizzes_data:
+            questions_data = quiz_data.pop('questions', [])
+            quiz = Quiz.objects.create(module=module, **quiz_data)
+
+            for question_data in questions_data:
+                answers_data = question_data.pop('answers', [])
+                question = Question.objects.create(quiz=quiz, **question_data)
+
+                for answer_data in answers_data:
+                    Answer.objects.create(question=question, **answer_data)
 
         return module
-    
-    """
-    i will come back to this commented code in case for reference 
-    purpose
-    
-    """
+
     def update(self, instance, validated_data):
         request_method = self.context['request'].method
-
-
-        # Get the existing lessons
-        existing_lessons = instance.lessons.all()
-
-        # Process the incoming lessons data
         lessons_data = validated_data.pop('lessons', [])
+        quizzes_data = validated_data.pop('quizzes', [])
 
-        # Create a dictionary to store the updated lessons
+        # Update lessons
+        existing_lessons = instance.lessons.all()
         updated_lessons = {}
 
-        if request_method == 'PATCH':
-            for lesson_data in lessons_data:
-                lesson_id = lesson_data.get('id')
-                if not lesson_id:
-                    raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
+        for lesson_data in lessons_data:
+            lesson_id = lesson_data.get('id')
+            if not lesson_id:
+                raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
 
-                # Update an existing lesson
-                lesson_instance = existing_lessons.filter(id=lesson_id).first()
-                if lesson_instance:
-                    for attr, value in lesson_data.items():
-                        setattr(lesson_instance, attr, value)
-                    updated_lessons[lesson_id] = lesson_instance
-                else:
-                    raise serializers.ValidationError({"id": f"Lesson with id {lesson_id} does not exist."})
-
-        elif request_method == 'PUT':
-            for lesson_data in lessons_data:
-                lesson_id = lesson_data.get('id')
-                if lesson_id:
-                    # Update an existing lesson
-                    lesson_instance = existing_lessons.filter(id=lesson_id).first()
-                    if lesson_instance:
-                        for attr, value in lesson_data.items():
-                            setattr(lesson_instance, attr, value)
-                        updated_lessons[lesson_id] = lesson_instance
-                    else:
-                        raise serializers.ValidationError({"id": f"Lesson with id {lesson_id} does not exist."})
-                else:
-                    # Create a new lesson
-                    lesson_data['module'] = instance
-                    new_lesson = Lesson(**lesson_data)
-                    new_lesson.save()
-                    updated_lessons[new_lesson.id] = new_lesson
+            lesson_instance = existing_lessons.filter(id=lesson_id).first()
+            if lesson_instance:
+                for attr, value in lesson_data.items():
+                    setattr(lesson_instance, attr, value)
+                updated_lessons[lesson_id] = lesson_instance
+            else:
+                raise serializers.ValidationError({"id": f"Lesson with id {lesson_id} does not exist."})
 
         # Save updated lessons
-        for lesson_id, lesson_instance in updated_lessons.items():
+        for lesson_instance in updated_lessons.values():
             lesson_instance.save()
+
+        # Update quizzes
+        existing_quizzes = instance.quizzes.all()
+        updated_quizzes = {}
+
+        for quiz_data in quizzes_data:
+            quiz_id = quiz_data.get('id')
+            if not quiz_id:
+                raise serializers.ValidationError({"id": "This field is required for updating a quiz."})
+
+            quiz_instance = existing_quizzes.filter(id=quiz_id).first()
+            if quiz_instance:
+                for attr, value in quiz_data.items():
+                    setattr(quiz_instance, attr, value)
+                updated_quizzes[quiz_id] = quiz_instance
+            else:
+                raise serializers.ValidationError({"id": f"Quiz with id {quiz_id} does not exist."})
+
+        # Save updated quizzes
+        for quiz_instance in updated_quizzes.values():
+            quiz_instance.save()
 
         # Update the module fields
         for attr, value in validated_data.items():
@@ -182,62 +212,46 @@ class ModuleSerializer(serializers.ModelSerializer):
         return instance
 
 
-
-
 class CourseSerializer(serializers.ModelSerializer):
-    created_by = serializers.SerializerMethodField() 
-    modules = ModuleSerializer(many=True, required=False)  # Include modules in the course
+    created_by = serializers.SerializerMethodField()
+    modules = ModuleSerializer(many=True, required=False)
 
     class Meta:
         model = Course
         read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
         fields = [
-            'id', 'course_title', 'course_description', 
-            'course_language', 'course_level', 'course_banner', 'course_category',
-            'price', 'certification', 'estimated_duration', 'created_by',
-            'created_at', 'updated_at', 'modules', 
+            'id', 'course_title', 'course_description', 'course_language', 'course_level',
+            'course_banner', 'course_category', 'price', 'certification', 'estimated_duration',
+            'created_by', 'created_at', 'updated_at', 'modules',
         ]
 
     def create(self, validated_data):
-            # Extract modules data from the validated data
-            modules_data = validated_data.pop('modules', [])
+        modules_data = validated_data.pop('modules', [])
+        course = Course.objects.create(**validated_data)
 
-            # Create the course
-            course = Course.objects.create(**validated_data)
+        for module_data in modules_data:
+            lessons_data = module_data.pop('lessons', [])
+            quizzes_data = module_data.pop('quizzes', [])
 
-            # Create modules, lessons, quizzes, questions, and answers
-            for module_data in modules_data:
-                lessons_data = module_data.pop('lessons', [])
-                quizzes_data = module_data.pop('quizzes', [])
+            module = Module.objects.create(course=course, **module_data)
 
-                # Create the module
-                module = Module.objects.create(course=course, **module_data)
+            # Create lessons for the module
+            for lesson_data in lessons_data:
+                Lesson.objects.create(module=module, **lesson_data)
 
-                # Create lessons for the module
-                for lesson_data in lessons_data:
-                    Lesson.objects.create(module=module, **lesson_data)
+            # Create quizzes for the module
+            for quiz_data in quizzes_data:
+                quiz_serializer = QuizSerializer(data=quiz_data, context=self.context)
+                quiz_serializer.is_valid(raise_exception=True)
+                quiz_serializer.save(module=module)  # Save the quiz with the module
 
-                # Create quizzes for the module
-                for quiz_data in quizzes_data:
-                    questions_data = quiz_data.pop('questions', [])
-                    quiz = Quiz.objects.create(module=module, **quiz_data)
+        return course
 
-                    # Create questions for the quiz
-                    for question_data in questions_data:
-                        answers_data = question_data.pop('answers', [])
-                        question = Question.objects.create(quiz=quiz, **question_data)
-
-                        # Create answers for the question
-                        for answer_data in answers_data:
-                            Answer.objects.create(question=question, **answer_data)
-
-            return course
-    
     def get_created_by(self, obj):
-        """Return the first name and last name of the creator."""
         if obj.created_by:
             return f"{obj.created_by.first_name} {obj.created_by.last_name}"
-        return None  
+        return None
+    
 
 
 class EnrollmentSerializer(serializers.ModelSerializer):
