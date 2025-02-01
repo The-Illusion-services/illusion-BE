@@ -8,11 +8,11 @@ All notable changes to Illusion Academy will be documented in this file.
 - 
 
 ### Fix
-- configured `Quiz` to follow schema provided
+- removed `is_correct` field in Quiz response
 
 
 ### Feat
 - 
 
-## [1.0.0] - 28-01-2025
+## [1.0.0] - 01-02-2025
 

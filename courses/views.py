@@ -135,7 +135,6 @@ class AssignmentCreateView(generics.CreateAPIView):
         serializer.save(course=course, created_by=self.request.user)
 
 
-
 class AssignmentUpdateView(generics.UpdateAPIView):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
