@@ -69,6 +69,7 @@ class QuizSubmissionSerializer(serializers.ModelSerializer):
         fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
 
 
+
 class QuizSerializer(serializers.ModelSerializer):
     options = serializers.ListField(
         child=serializers.DictField(),
@@ -85,8 +86,7 @@ class QuizSerializer(serializers.ModelSerializer):
         representation['options'] = [
             {
                 "id": answer.id,
-                "text": answer.answer_text,
-                "isCorrect": answer.is_correct,
+                "text": answer.answer_text
             }
             for question in instance.questions.all()
             for answer in question.answers.all()
