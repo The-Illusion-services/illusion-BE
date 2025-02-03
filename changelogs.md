@@ -8,11 +8,12 @@ All notable changes to Illusion Academy will be documented in this file.
 - 
 
 ### Fix
-- removed `is_correct` field in Quiz response
+- fix `QuizSubmissionView` view and `QuizSerializer` serializer to capture `Quiz` data during course creation
+
 
 
 ### Feat
-- 
+- added `has_submitted` check to know if user has attempted the `Quiz` before
 
-## [1.0.0] - 01-02-2025
+## [1.0.0] - 03-02-2025
 
