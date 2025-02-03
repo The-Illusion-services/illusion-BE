@@ -76,9 +76,19 @@ class QuizSerializer(serializers.ModelSerializer):
         required=False  # Options are not mandatory
     )
 
+    has_submitted = serializers.SerializerMethodField()
+
     class Meta:
         model = Quiz
-        fields = ['id', 'title', 'options', 'created_at']
+        fields = ['id', 'title', 'options', 'created_at', 'has_submitted']
+
+
+    def get_has_submitted(self, obj):
+        """Check if the user has submitted this quiz"""
+        request = self.context.get('request')
+        if request and request.user.is_authenticated:
+            return QuizSubmission.objects.filter(quiz=obj, user=request.user).exists()
+        return False
 
     def to_representation(self, instance):
         """Transform the response to include options."""
@@ -86,13 +96,16 @@ class QuizSerializer(serializers.ModelSerializer):
         representation['options'] = [
             {
                 "id": answer.id,
-                "text": answer.answer_text
+                "text": answer.answer_text,
+                # "is_correct": answer.is_correct
             }
             for question in instance.questions.all()
             for answer in question.answers.all()
         ]
         return representation
+    
 
+    
     def create(self, validated_data):
         """Create a quiz along with nested questions and answers."""
         options = validated_data.pop('options', [])
