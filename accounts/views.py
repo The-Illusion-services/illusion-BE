@@ -171,12 +171,6 @@ class LoginPage(View):
         )
 
 
-
-class ProtectedView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        return Response({"message": "You are authenticated"}, status=200)
     
 
 class ProfileView(APIView):

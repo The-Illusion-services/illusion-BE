@@ -21,7 +21,7 @@ urlpatterns = [
         name="google_login_callback",
     ),
 
-    path('protected/', ProtectedView.as_view(), name='protected-view'),
+
 
     path('profile/', ProfileView.as_view(), name='profile'),
     path('', include(router.urls)),
