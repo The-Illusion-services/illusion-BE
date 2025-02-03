@@ -22,6 +22,35 @@ class CourseCreate(generics.CreateAPIView):
         # Pass the request user to the serializer
         serializer.save(created_by=self.request.user)
 
+class CourseUpdateView(generics.UpdateAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated, IsCreator]
+
+    def perform_update(self, serializer):
+        course = self.get_object()
+
+        # Check if the user updating the course is the one who created it
+        if course.created_by != self.request.user:
+            raise PermissionDenied("You are not allowed to update this course.")
+
+        # Proceed with the update
+        serializer.save()
+
+
+class CourseDeleteView(generics.DestroyAPIView):
+    queryset = Course.objects.all()
+    serializer_class = CourseSerializer
+    permission_classes = [IsAuthenticated, IsCreator]
+
+    def perform_destroy(self, instance):
+        # Check if the user deleting the course is the one who created it
+        if instance.created_by != self.request.user:
+            raise PermissionDenied("You are not allowed to delete this course.")
+
+        # Proceed with the deletion
+        instance.delete()
+
 
 class AvailableCoursesList(generics.ListAPIView):
     queryset = Course.objects.all()
@@ -84,6 +113,7 @@ class ModuleUpdateView(generics.UpdateAPIView):
     queryset = Module.objects.all()
     serializer_class = ModuleSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsCreator]
+    
 
     def perform_update(self, serializer):
         # Get the module to update
