@@ -175,19 +175,28 @@ class LoginPage(View):
 
 class ProfileView(APIView):
     serializer_class = ProfileSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
-    def get_object(self):
-        return User.objects.filter(user=self.kwargs['id'])
+    def get_object(self, id=None):
+        if id:
+            return User.objects.get(id=id)
+        return self.request.user  # If no id is given, return the authenticated user
+
+    def get(self, request, id=None):
+        try:
+            instance = self.get_object(id)
+            serializer = self.serializer_class(instance)
+            return Response(serializer.data)
+        except User.DoesNotExist:
+            return Response({"error": "User not found"}, status=status.HTTP_404_NOT_FOUND)
 
     def update(self, request, *args, **kwargs):
         partial = kwargs.pop('partial', False)
-        instance = self.get_object()
-        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        instance = self.get_object(kwargs.get('id'))
+        serializer = self.serializer_class(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
-        self.perform_update(serializer)
+        serializer.save()
         return Response(serializer.data)
-    
 
 class UserViewSet(APIView):
     queryset = User.objects.all()
