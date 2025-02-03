@@ -56,6 +56,6 @@ class GoogleSignUpSerializer(serializers.Serializer):
 class ProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'company', 'last_name', 'phone', 'email', 'role')
+        fields = ('id', 'username', 'first_name',  'last_name', 'phone', 'email', 'role')
         read_only_fields = ('id',)
     
