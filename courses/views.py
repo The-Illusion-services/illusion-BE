@@ -135,7 +135,6 @@ class AssignmentCreateView(generics.CreateAPIView):
         serializer.save(course=course, created_by=self.request.user)
 
 
-
 class AssignmentUpdateView(generics.UpdateAPIView):
     queryset = Assignment.objects.all()
     serializer_class = AssignmentSerializer
@@ -254,7 +253,11 @@ class QuizSubmissionView(generics.CreateAPIView):
         quiz = get_object_or_404(Quiz, id=self.request.data.get('quiz'))
         user = self.request.user
 
-        # Logic to calculate score based on user's answers
+        # Prevent duplicate submissions
+        if QuizSubmission.objects.filter(quiz=quiz, user=user).exists():
+            raise ValidationError("You have already submitted this quiz.")
+
+        # Calculate the quiz score
         submitted_answers = self.request.data.get('answers', [])
         correct_answers = 0
         total_questions = quiz.questions.count()
@@ -267,20 +270,19 @@ class QuizSubmissionView(generics.CreateAPIView):
             if correct_answer and correct_answer.id == selected_answer_id:
                 correct_answers += 1
 
-        # Calculate score as a percentage
         score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
 
         # Save the submission
         submission = serializer.save(user=user, quiz=quiz, score=score)
 
-        # If the user has completed the course (all quizzes), generate a certificate
-        course = quiz.course
-        all_quizzes = course.quizzes.count()
-        completed_quizzes = QuizSubmission.objects.filter(user=user, quiz__course=course).count()
+        # Check if all quizzes in the module are completed
+        course = quiz.module.course
+        all_quizzes = Quiz.objects.filter(module__course=course).count()
+        completed_quizzes = QuizSubmission.objects.filter(user=user, quiz__module__course=course).count()
 
         if completed_quizzes == all_quizzes and not Certification.objects.filter(user=user, course=course).exists():
-            # Create a certificate and mark it as verified
             Certification.objects.create(user=user, course=course, is_verified=True)
+
 
 
 class ResourceListView(generics.ListAPIView):
