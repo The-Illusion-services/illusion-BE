@@ -67,6 +67,7 @@ class QuizSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizSubmission
         fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
+        read_only_fields = ['score']  
 
 
 
@@ -123,115 +124,6 @@ class QuizSerializer(serializers.ModelSerializer):
         return quiz
 
 
-
-# class LessonSerializer(serializers.ModelSerializer):
-#     id = serializers.IntegerField(required=False)  # Allow 'id' to be writable (for updates)
-
-#     class Meta:
-#         model = Lesson
-#         fields = ['id', 'title', 'lesson_resource', 'lesson_file', 'content', 'is_published']
-
-
-# class ModuleSerializer(serializers.ModelSerializer):
-#     lessons = LessonSerializer(many=True, required=False)  # Lessons are optional
-#     quizzes = QuizSerializer(many=True, required=False)  # Quizzes are optional (with updated QuizSerializer)
-
-#     class Meta:
-#         model = Module
-#         fields = ['id', 'title', 'lessons', 'quizzes']
-
-#     def validate_lessons(self, value):
-#         """ Ensure lessons include an 'id' for update requests (PATCH/PUT) """
-#         request_method = self.context['request'].method
-#         if request_method in ['PATCH', 'PUT'] and value:  # Only validate if lessons exist
-#             for lesson in value:
-#                 if 'id' not in lesson:
-#                     raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
-#         return value
-
-#     def create(self, validated_data):
-#         """ Create a new Module and related Lessons/Quizzes """
-#         lessons_data = validated_data.pop('lessons', [])
-#         quizzes_data = validated_data.pop('quizzes', [])
-#         module = Module.objects.create(**validated_data)  # Create the module
-
-#         # Create lessons for the module
-#         for lesson_data in lessons_data:
-#             Lesson.objects.create(module=module, **lesson_data)
-
-#         # Create quizzes for the module
-#         for quiz_data in quizzes_data:
-#             questions_data = quiz_data.pop('questions', [])
-#             quiz = Quiz.objects.create(module=module, **quiz_data)
-
-#             # Create questions and answers for each quiz
-#             for question_data in questions_data:
-#                 answers_data = question_data.pop('answers', [])
-#                 question = Question.objects.create(quiz=quiz, **question_data)
-
-#                 for answer_data in answers_data:
-#                     Answer.objects.create(question=question, **answer_data)
-
-#         return module
-
-#     def update(self, instance, validated_data):
-#         """ Update a module, its lessons, and quizzes """
-#         request_method = self.context['request'].method
-#         lessons_data = validated_data.pop('lessons', [])
-#         quizzes_data = validated_data.pop('quizzes', [])
-
-#         # Update the module fields
-#         for attr, value in validated_data.items():
-#             setattr(instance, attr, value)
-#         instance.save()
-
-#         # Handle lessons
-#         if lessons_data:  # Only process lessons if they are provided
-#             existing_lessons = {lesson.id: lesson for lesson in instance.lessons.all()}
-#             updated_lessons = {}
-
-#             for lesson_data in lessons_data:
-#                 lesson_id = lesson_data.get('id')
-
-#                 if not lesson_id:
-#                     raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
-
-#                 lesson_instance = existing_lessons.get(lesson_id)
-#                 if lesson_instance:
-#                     for attr, value in lesson_data.items():
-#                         setattr(lesson_instance, attr, value)
-#                     updated_lessons[lesson_id] = lesson_instance
-#                 else:
-#                     raise serializers.ValidationError({"id": f"Lesson with id {lesson_id} does not exist."})
-
-#             # Save updated lessons
-#             for lesson_instance in updated_lessons.values():
-#                 lesson_instance.save()
-
-#         # Handle quizzes
-#         if quizzes_data:  # Only process quizzes if they are provided
-#             existing_quizzes = {quiz.id: quiz for quiz in instance.quizzes.all()}
-#             updated_quizzes = {}
-
-#             for quiz_data in quizzes_data:
-#                 quiz_id = quiz_data.get('id')
-
-#                 if not quiz_id:
-#                     raise serializers.ValidationError({"id": "This field is required for updating a quiz."})
-
-#                 quiz_instance = existing_quizzes.get(quiz_id)
-#                 if quiz_instance:
-#                     for attr, value in quiz_data.items():
-#                         setattr(quiz_instance, attr, value)
-#                     updated_quizzes[quiz_id] = quiz_instance
-#                 else:
-#                     raise serializers.ValidationError({"id": f"Quiz with id {quiz_id} does not exist."})
-
-#             # Save updated quizzes
-#             for quiz_instance in updated_quizzes.values():
-#                 quiz_instance.save()
-
-#         return instance
 
 class LessonSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)  # Allow id to be writable
