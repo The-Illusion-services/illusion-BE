@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     AssignmentSubmissionCreateView, CertificationDetailView, CertificationListCreateView, CourseCreate, CourseDeleteView, CourseUpdateView,
-    EnrollCourseView, EnrollmentListView, LessonListView,
+    EnrollCourseView, EnrollmentListView, LearningProgressView, LessonListView,
     LessonProgressUpdateView, 
     ModuleCreateView, 
     ModuleListView, ModuleUpdateView,
@@ -44,4 +44,6 @@ urlpatterns = [
 
     # Retrieve, update a certification
     path('certifications/<int:pk>/', CertificationDetailView.as_view(), name='certification-detail'),
+
+    path('progress/', LearningProgressView.as_view(), name='learning-progress'),
 ]
