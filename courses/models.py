@@ -94,7 +94,7 @@ class Resource(models.Model):
 
 
 class Quiz(models.Model):
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, default='')
     module = models.ForeignKey(Module, null=True, blank=True, on_delete=models.CASCADE, related_name="quizzes")  # Updated to Module
     created_at = models.DateTimeField(auto_now_add=True)
 
