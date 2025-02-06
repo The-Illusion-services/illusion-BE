@@ -281,44 +281,67 @@ class QuizSubmissionView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
-        # Extract quiz and answers from the request data
-        quiz = get_object_or_404(Quiz, id=request.data.get('quiz'))
         user = request.user
-        submitted_answers = request.data.get('answers', [])
+        module_id = request.data.get('module')  # Get the module ID from request
+        quizzes_data = request.data.get('quizzes', [])  # List of quizzes with answers
 
-        # Calculate score
-        correct_answers = 0
-        total_questions = quiz.questions.count()
+        if not module_id or not quizzes_data:
+            return Response({"error": "Module ID and quizzes data are required"}, status=status.HTTP_400_BAD_REQUEST)
 
-        for answer in submitted_answers:
-            question = get_object_or_404(Question, id=answer['question_id'])
-            selected_answer = get_object_or_404(Answer, id=answer['selected_answer_id'])
-            if selected_answer.is_correct:
-                correct_answers += 1
+        module = get_object_or_404(Module, id=module_id)
 
-        score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+        # Ensure all quizzes belong to the same module
+        quizzes = Quiz.objects.filter(module=module)
+        if not quizzes.exists():
+            return Response({"error": "No quizzes found for this module"}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Save the quiz submission
-        submission = self.get_serializer(data=request.data)
-        submission.is_valid(raise_exception=True)
-        submission.save(user=user, quiz=quiz, score=score)
+        submissions = []
+        for quiz_data in quizzes_data:
+            quiz = get_object_or_404(Quiz, id=quiz_data['quiz'])
+            submitted_answers = quiz_data.get('answers', [])
+
+            correct_answers = 0
+            total_questions = quiz.questions.count()
+
+            for answer in submitted_answers:
+                question = get_object_or_404(Question, id=answer['question_id'])
+                selected_answer = get_object_or_404(Answer, id=answer['selected_answer_id'])
+                if selected_answer.is_correct:
+                    correct_answers += 1
+
+            score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+
+            # Save submission
+            submission, _ = QuizSubmission.objects.get_or_create(
+                user=user, quiz=quiz, defaults={'score': score}
+            )
+            submissions.append(QuizSubmissionSerializer(submission).data)
 
         # Check if all quizzes in the module are completed
-        course = quiz.module.course
-        all_quizzes = Quiz.objects.filter(module__course=course).count()
-        completed_quizzes = QuizSubmission.objects.filter(user=user, quiz__module__course=course).count()
+        all_quizzes_in_module = quizzes.count()
+        completed_quizzes = QuizSubmission.objects.filter(user=user, quiz__module=module).count()
 
-        # Create the certification if all quizzes are completed
-        certification_data = None
-        if completed_quizzes == all_quizzes and not Certification.objects.filter(user=user, course=course).exists():
-            # Create and save certification
-            certification = Certification.objects.create(user=user, course=course, is_verified=True)
-            certification_data = CertificationSerializer(certification).data
+        next_module = Module.objects.filter(course=module.course, id__gt=module.id).order_by('id').first()
+        next_module_unlocked = False
 
-        # Return the response with both quiz submission and certification (if applicable)
+        if completed_quizzes == all_quizzes_in_module:
+            if next_module:
+                next_module_unlocked = True  # Indicate that the next module is unlocked
+            else:
+                # If no more modules, check for certification
+                all_modules = Module.objects.filter(course=module.course).count()
+                completed_modules = Module.objects.filter(
+                    quizzes__quizsubmission__user=user
+                ).distinct().count()
+
+                if completed_modules == all_modules and not Certification.objects.filter(user=user, course=module.course).exists():
+                    Certification.objects.create(user=user, course=module.course, is_verified=True)
+
+        # Prepare response
         return Response({
-            'quiz_submission': submission.data,
-            'certificate': certification_data if certification_data else "You've already been certified",
+            'quiz_submissions': submissions,
+            'next_module_unlocked': next_module_unlocked,
+            'certificate': CertificationSerializer(Certification.objects.filter(user=user, course=module.course).first()).data if next_module is None else None,
             'user': {
                 'first_name': user.first_name,
                 'last_name': user.last_name
