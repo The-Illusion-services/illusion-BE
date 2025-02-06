@@ -8,12 +8,13 @@ All notable changes to Illusion Academy will be documented in this file.
 - 
 
 ### Fix
-- fix `QuizSubmissionView` view and `QuizSerializer` serializer to capture `Quiz` data during course creation
-
+- added `default` argument in `title` field in `Quiz`
+- fixed `QuizSubmissionView` to return quiz scores and user details in responses
+- fixed `QuizSerializer` and `ModuleSerializer` to return Quiz data in responses
 
 
 ### Feat
-- added `has_submitted` check to know if user has attempted the `Quiz` before
+- 
 
-## [1.0.0] - 03-02-2025
+## [1.0.0] - 06-02-2025
 

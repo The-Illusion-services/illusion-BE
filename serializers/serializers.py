@@ -1,4 +1,7 @@
 from datetime import timedelta
+
+from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
 from accounts.models import *
 from courses.models import *
 from jobs.models import *
@@ -67,62 +70,75 @@ class QuizSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = QuizSubmission
         fields = ['id', 'quiz', 'user', 'submitted_at', 'score']
-        read_only_fields = ['score']  
+        read_only_fields = ['score', 'user', 'submitted_at']
+
+
 
 
 
 class QuizSerializer(serializers.ModelSerializer):
     options = serializers.ListField(
         child=serializers.DictField(),
-        required=False  # Options are not mandatory
+        required=False  
     )
-
     has_submitted = serializers.SerializerMethodField()
 
     class Meta:
         model = Quiz
         fields = ['id', 'title', 'options', 'created_at', 'has_submitted']
 
-
     def get_has_submitted(self, obj):
-        """Check if the user has submitted this quiz"""
         request = self.context.get('request')
         if request and request.user.is_authenticated:
             return QuizSubmission.objects.filter(quiz=obj, user=request.user).exists()
         return False
 
-    def to_representation(self, instance):
-        """Transform the response to include options."""
-        representation = super().to_representation(instance)
-        representation['options'] = [
-            {
-                "id": answer.id,
-                "text": answer.answer_text,
-                # "is_correct": answer.is_correct
-            }
-            for question in instance.questions.all()
-            for answer in question.answers.all()
-        ]
-        return representation
-    
-
-    
     def create(self, validated_data):
-        """Create a quiz along with nested questions and answers."""
         options = validated_data.pop('options', [])
-        quiz = Quiz.objects.create(**validated_data)
+        
+        # Use title as question_text
+        title = validated_data.get('title')
+        if not title:
+            raise serializers.ValidationError({"title": "Title is required."})
+        
+        quiz = Quiz.objects.create(
+            title=title,
+            module=validated_data.get('module')
+        )
 
-        # Create a single question with the provided options
-        question = Question.objects.create(quiz=quiz, question_text="Default Question")
+        # Create question using title as the question text
+        question = Question.objects.create(
+            quiz=quiz,
+            question_text=title  # <-- Use title here
+        )
+
+        # Create answers/options
         for option in options:
             Answer.objects.create(
                 question=question,
                 answer_text=option['text'],
-                is_correct=option.get('isCorrect', False),
+                is_correct=option.get('isCorrect', False)
             )
 
         return quiz
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        question = instance.questions.first()
+        if question:
+            data['question_id'] = question.id
+            data['question_text'] = question.question_text  # <-- Always returns title as question
+            data['options'] = [
+                {
+                    'id': answer.id,
+                    'text': answer.answer_text,
+                    'isCorrect': answer.is_correct
+                }
+                for answer in question.answers.all()
+            ]
+        return data
+
+    
 
 
 class LessonSerializer(serializers.ModelSerializer):
@@ -141,32 +157,37 @@ class ModuleSerializer(serializers.ModelSerializer):
         model = Module
         fields = ['id', 'title', 'lessons', 'quizzes']
 
-    def validate_lessons(self, value):
-        request_method = self.context['request'].method
-        if request_method == 'PATCH':
-            for lesson in value:
-                if 'id' not in lesson:
-                    raise serializers.ValidationError({"id": "This field is required for updating a lesson."})
-        return value
 
     def create(self, validated_data):
         lessons_data = validated_data.pop('lessons', [])
         quizzes_data = validated_data.pop('quizzes', [])
+        
         module = Module.objects.create(**validated_data)
 
         for lesson_data in lessons_data:
             Lesson.objects.create(module=module, **lesson_data)
 
         for quiz_data in quizzes_data:
-            questions_data = quiz_data.pop('questions', [])
+            options_data = quiz_data.pop('options', [])
+            
+            # Use title as question_text
+            title = quiz_data.get('title', '')
+            if not title:
+                raise serializers.ValidationError({"title": "Title is required for quizzes."})
+
             quiz = Quiz.objects.create(module=module, **quiz_data)
-
-            for question_data in questions_data:
-                answers_data = question_data.pop('answers', [])
-                question = Question.objects.create(quiz=quiz, **question_data)
-
-                for answer_data in answers_data:
-                    Answer.objects.create(question=question, **answer_data)
+            
+            question = Question.objects.create(
+                quiz=quiz,
+                question_text=title  
+            )
+            
+            for option in options_data:
+                Answer.objects.create(
+                    question=question,
+                    answer_text=option['text'],
+                    is_correct=option.get('isCorrect', False)
+                )
 
         return module
 
@@ -197,6 +218,9 @@ class ModuleSerializer(serializers.ModelSerializer):
         existing_quizzes = {quiz.id: quiz for quiz in instance.quizzes.all()}
         for quiz_data in quizzes_data:
             quiz_id = quiz_data.get('id')
+
+            if quiz_id is None:
+                raise serializers.ValidationError({"id": "Quiz id is required for updating a quiz."})
 
             if quiz_id in existing_quizzes:
                 quiz_instance = existing_quizzes[quiz_id]
@@ -243,23 +267,12 @@ class CourseSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         modules_data = validated_data.pop('modules', [])
         course = Course.objects.create(**validated_data)
-
+        
         for module_data in modules_data:
-            lessons_data = module_data.pop('lessons', [])
-            quizzes_data = module_data.pop('quizzes', [])
-
-            module = Module.objects.create(course=course, **module_data)
-
-            # Create lessons for the module
-            for lesson_data in lessons_data:
-                Lesson.objects.create(module=module, **lesson_data)
-
-            # Create quizzes for the module
-            for quiz_data in quizzes_data:
-                quiz_serializer = QuizSerializer(data=quiz_data, context=self.context)
-                quiz_serializer.is_valid(raise_exception=True)
-                quiz_serializer.save(module=module)  # Save the quiz with the module
-
+            serializer = ModuleSerializer(data=module_data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(course=course)
+            
         return course
 
     def get_created_by(self, obj):

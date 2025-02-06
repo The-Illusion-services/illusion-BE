@@ -259,7 +259,7 @@ class LessonProgressUpdateView(generics.UpdateAPIView):
 class QuizCreateView(generics.CreateAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
-    permission_classes = [IsAuthenticated, IsCreator]  # Ensure only employers can create quizzes
+    permission_classes = [IsAuthenticated, IsCreator]  # Ensure only Creators can create quizzes
 
     def perform_create(self, serializer):
         serializer.save(created_by=self.request.user)
@@ -274,45 +274,56 @@ class QuizDetailView(generics.RetrieveAPIView):
     serializer_class = QuizSerializer
     permission_classes = [IsAuthenticated]
 
+
 class QuizSubmissionView(generics.CreateAPIView):
     queryset = QuizSubmission.objects.all()
     serializer_class = QuizSubmissionSerializer
-    permission_classes = [IsAuthenticated, IsLearner]
+    permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
-        quiz = get_object_or_404(Quiz, id=self.request.data.get('quiz'))
-        user = self.request.user
+    def create(self, request, *args, **kwargs):
+        # Extract quiz and answers from the request data
+        quiz = get_object_or_404(Quiz, id=request.data.get('quiz'))
+        user = request.user
+        submitted_answers = request.data.get('answers', [])
 
-        # Prevent duplicate submissions
-        if QuizSubmission.objects.filter(quiz=quiz, user=user).exists():
-            raise ValidationError("You have already submitted this quiz.")
-
-        # Calculate the quiz score
-        submitted_answers = self.request.data.get('answers', [])
+        # Calculate score
         correct_answers = 0
         total_questions = quiz.questions.count()
 
         for answer in submitted_answers:
-            question_id = answer.get('question_id')
-            selected_answer_id = answer.get('answer_id')
-            correct_answer = Answer.objects.filter(question_id=question_id, is_correct=True).first()
-
-            if correct_answer and correct_answer.id == selected_answer_id:
+            question = get_object_or_404(Question, id=answer['question_id'])
+            selected_answer = get_object_or_404(Answer, id=answer['selected_answer_id'])
+            if selected_answer.is_correct:
                 correct_answers += 1
 
         score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
 
-        # Save the submission
-        submission = serializer.save(user=user, quiz=quiz, score=score)
+        # Save the quiz submission
+        submission = self.get_serializer(data=request.data)
+        submission.is_valid(raise_exception=True)
+        submission.save(user=user, quiz=quiz, score=score)
 
         # Check if all quizzes in the module are completed
         course = quiz.module.course
         all_quizzes = Quiz.objects.filter(module__course=course).count()
         completed_quizzes = QuizSubmission.objects.filter(user=user, quiz__module__course=course).count()
 
+        # Create the certification if all quizzes are completed
+        certification_data = None
         if completed_quizzes == all_quizzes and not Certification.objects.filter(user=user, course=course).exists():
-            Certification.objects.create(user=user, course=course, is_verified=True)
+            # Create and save certification
+            certification = Certification.objects.create(user=user, course=course, is_verified=True)
+            certification_data = CertificationSerializer(certification).data
 
+        # Return the response with both quiz submission and certification (if applicable)
+        return Response({
+            'quiz_submission': submission.data,
+            'certificate': certification_data if certification_data else "You've already been certified",
+            'user': {
+                'first_name': user.first_name,
+                'last_name': user.last_name
+            }
+        })
 
 
 class ResourceListView(generics.ListAPIView):
