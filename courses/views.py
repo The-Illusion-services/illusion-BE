@@ -10,7 +10,7 @@ from serializers.serializers import *
 from permissions.permissions import IsLearner, IsCreator 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 
-
+from rest_framework.views import APIView
 
 
 class CourseCreate(generics.CreateAPIView):
@@ -396,3 +396,25 @@ class CertificationDetailView(generics.RetrieveAPIView):
         Restrict the queryset to only allow users to access their own certifications.
         """
         return Certification.objects.filter(user=self.request.user)
+
+class LearningProgressView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Get all courses where the user has attempted any quiz
+        total_courses_enrolled = Course.objects.filter(
+            modules__quizzes__quizsubmission__user=user
+        ).distinct().count()
+
+        # Get courses where the user has earned a certificate
+        total_courses_completed = Certification.objects.filter(
+            user=user, is_verified=True
+        ).count()
+
+        # Return response
+        return Response({
+            "total_courses_enrolled": total_courses_enrolled,
+            "total_courses_completed": total_courses_completed
+        })

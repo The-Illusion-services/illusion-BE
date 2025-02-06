@@ -109,7 +109,7 @@ class QuizSerializer(serializers.ModelSerializer):
         # Create question using title as the question text
         question = Question.objects.create(
             quiz=quiz,
-            question_text=title  # <-- Use title here
+            question_text=title  #  Use title here
         )
 
         # Create answers/options
@@ -127,12 +127,12 @@ class QuizSerializer(serializers.ModelSerializer):
         question = instance.questions.first()
         if question:
             data['question_id'] = question.id
-            data['question_text'] = question.question_text  # <-- Always returns title as question
+            data['question_text'] = question.question_text  
             data['options'] = [
                 {
                     'id': answer.id,
                     'text': answer.answer_text,
-                    'isCorrect': answer.is_correct
+                    # 'isCorrect': answer.is_correct
                 }
                 for answer in question.answers.all()
             ]
@@ -392,3 +392,8 @@ class ApplicationSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("You have already applied for this job.")
         
         return data
+    
+class LearningProgressSerializer(serializers.Serializer):
+    total_courses_enrolled = serializers.IntegerField()
+    total_courses_completed = serializers.IntegerField()
+
