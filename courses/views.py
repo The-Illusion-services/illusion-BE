@@ -9,7 +9,7 @@ from rest_framework import generics
 from serializers.serializers import *
 from permissions.permissions import IsLearner, IsCreator 
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
-
+from django.db.models import Count, Q, F, Sum
 from rest_framework.views import APIView
 
 
@@ -420,7 +420,7 @@ class CertificationDetailView(generics.RetrieveAPIView):
         """
         return Certification.objects.filter(user=self.request.user)
 
-from django.db.models import Sum
+
 
 class LearningProgressView(APIView):
     permission_classes = [IsAuthenticated]
@@ -430,7 +430,7 @@ class LearningProgressView(APIView):
         response_data = {}
 
         # Check if the user is a Creator
-        is_creator = user.role == "Creator"  # Or use user.role == "Creator"
+        is_creator = user.groups.filter(name="Creator").exists()
 
         if is_creator:
             # Creator Metrics
@@ -446,5 +446,13 @@ class LearningProgressView(APIView):
             response_data["leaderboard_xp"] = QuizSubmission.objects.filter(user=user).aggregate(
                 total_xp=Sum("score")
             )["total_xp"] or 0
+
+            # Count completed modules (all quizzes in module submitted)
+            total_modules_completed = Module.objects.annotate(
+                total_quizzes=Count("quizzes"),
+                completed_quizzes=Count("quizzes", filter=Q(quizzes__quizsubmission__user=user))
+            ).filter(total_quizzes=F("completed_quizzes")).count()
+
+            response_data["total_modules_completed"] = total_modules_completed
 
         return Response(response_data)
