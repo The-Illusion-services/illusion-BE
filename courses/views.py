@@ -430,7 +430,7 @@ class LearningProgressView(APIView):
         response_data = {}
 
         # Check if the user is a Creator
-        is_creator = user.groups.filter(name="Creator").exists()
+        is_creator = user.role == "Creator"
 
         if is_creator:
             # Creator Metrics
