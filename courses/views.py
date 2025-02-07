@@ -420,24 +420,31 @@ class CertificationDetailView(generics.RetrieveAPIView):
         """
         return Certification.objects.filter(user=self.request.user)
 
+from django.db.models import Sum
+
 class LearningProgressView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
+        response_data = {}
 
-        # Get all courses where the user has attempted any quiz
-        total_courses_enrolled = Course.objects.filter(
-            modules__quizzes__quizsubmission__user=user
-        ).distinct().count()
+        # Check if the user is a Creator
+        is_creator = user.role == "Creator"  # Or use user.role == "Creator"
 
-        # Get courses where the user has earned a certificate
-        total_courses_completed = Certification.objects.filter(
-            user=user, is_verified=True
-        ).count()
+        if is_creator:
+            # Creator Metrics
+            response_data["total_courses_created"] = Course.objects.filter(created_by=user).count()
+            response_data["total_enrollments"] = Enrollment.objects.filter(course__created_by=user).count()
+            response_data["total_revenue"] = Enrollment.objects.filter(course__created_by=user).aggregate(
+                revenue=Sum("course__price")
+            )["revenue"] or 0
+        else:
+            # Learner Metrics
+            response_data["total_courses_enrolled"] = Enrollment.objects.filter(user=user).count()
+            response_data["total_courses_completed"] = Certification.objects.filter(user=user, is_verified=True).count()
+            response_data["leaderboard_xp"] = QuizSubmission.objects.filter(user=user).aggregate(
+                total_xp=Sum("score")
+            )["total_xp"] or 0
 
-        # Return response
-        return Response({
-            "total_courses_enrolled": total_courses_enrolled,
-            "total_courses_completed": total_courses_completed
-        })
+        return Response(response_data)
