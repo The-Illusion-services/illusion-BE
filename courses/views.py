@@ -53,9 +53,12 @@ class CourseDeleteView(generics.DestroyAPIView):
 
 
 class AvailableCoursesList(generics.ListAPIView):
-    queryset = Course.objects.all()
     serializer_class = CourseSerializer
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return Course.objects.filter(is_deleted=False)
+
 
 # class CourseDeleteView(generics.RetrieveDestroyAPIView):
 #     queryset = Course.objects.all()
@@ -76,7 +79,8 @@ class UserCreatedCoursesList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Course.objects.filter(created_by=self.request.user)
+        return Course.objects.filter(created_by=self.request.user, is_deleted=False)
+
 
 
 class UserEnrolledCoursesList(generics.ListAPIView):
@@ -84,7 +88,8 @@ class UserEnrolledCoursesList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Course.objects.filter(enrollments__user=self.request.user)
+        return Course.objects.filter(enrollments__user=self.request.user, is_deleted=False)
+
 
 
 
