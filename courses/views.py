@@ -12,6 +12,9 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 from django.db.models import Count, Q, F, Sum
 from rest_framework.views import APIView
 from django.core.cache import cache
+from .pagination import CustomPageNumberPagination
+
+
 
 class CourseCreate(generics.CreateAPIView):
     queryset = Course.objects.all()
@@ -55,8 +58,9 @@ class CourseDeleteView(generics.DestroyAPIView):
 
 
 class AvailableCoursesList(generics.ListAPIView):
-    serializer_class = CourseSerializer
+    serializer_class = CourseListSerializer
     permission_classes = [AllowAny]
+    pagination_class = CustomPageNumberPagination  
 
     def get_queryset(self):
         cache_key = "available_courses"
@@ -71,24 +75,10 @@ class AvailableCoursesList(generics.ListAPIView):
 
 
 
-
-# class CourseDeleteView(generics.RetrieveDestroyAPIView):
-#     queryset = Course.objects.all()
-#     serializer_class = CourseSerializer
-
-#     def delete(self, request, *args, **kwargs):
-#         # Get the course instance
-#         course = self.get_object()
-        
-#         # Delete the course
-#         course.delete()
-        
-#         # Return success response
-#         return Response({"message": "Course deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
-
 class UserCreatedCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPageNumberPagination  
 
     def get_queryset(self):
         return Course.objects.filter(created_by=self.request.user, is_deleted=False).select_related("created_by").order_by("-created_at")
@@ -98,6 +88,7 @@ class UserCreatedCoursesList(generics.ListAPIView):
 class UserEnrolledCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
     permission_classes = [IsAuthenticated]
+    pagination_class = CustomPageNumberPagination  
 
     def get_queryset(self):
         return Course.objects.filter(enrollments__user=self.request.user, is_deleted=False).select_related("created_by").order_by("-created_at")
