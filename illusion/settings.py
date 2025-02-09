@@ -162,6 +162,7 @@ DATABASES = {
     'PASSWORD': getenv('PGPASSWORD'),
     'HOST': getenv('PGHOST'),
     'PORT': '5432',
+    'CONN_MAX_AGE': 600,
     'OPTIONS': {
       'sslmode': 'require',
     },
