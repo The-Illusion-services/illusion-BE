@@ -46,10 +46,11 @@ class Course(models.Model):
     estimated_duration = models.IntegerField(help_text="Estimated duration in hours", default=1)
     
     # Tracking creation and updates
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_deleted = models.BooleanField(default=False, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     updated_at = models.DateTimeField(auto_now=True)
-    is_deleted = models.BooleanField(default=False)
+
 
     def delete(self, *args, **kwargs):
         self.is_deleted = True

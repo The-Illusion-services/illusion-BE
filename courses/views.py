@@ -11,7 +11,7 @@ from permissions.permissions import IsLearner, IsCreator
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated, AllowAny
 from django.db.models import Count, Q, F, Sum
 from rest_framework.views import APIView
-
+from django.core.cache import cache
 
 class CourseCreate(generics.CreateAPIView):
     queryset = Course.objects.all()
@@ -52,12 +52,24 @@ class CourseDeleteView(generics.DestroyAPIView):
         instance.delete()
 
 
+
+
 class AvailableCoursesList(generics.ListAPIView):
     serializer_class = CourseSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return Course.objects.filter(is_deleted=False)
+        cache_key = "available_courses"
+        cached_data = cache.get(cache_key)
+
+        if cached_data is not None:
+            return cached_data  # Return cached results
+
+        queryset = Course.objects.filter(is_deleted=False).select_related("created_by").order_by("-created_at")
+        cache.set(cache_key, queryset, timeout=300)  # Cache for 5 minutes
+        return queryset
+
+
 
 
 # class CourseDeleteView(generics.RetrieveDestroyAPIView):
@@ -79,7 +91,7 @@ class UserCreatedCoursesList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Course.objects.filter(created_by=self.request.user, is_deleted=False)
+        return Course.objects.filter(created_by=self.request.user, is_deleted=False).select_related("created_by").order_by("-created_at")
 
 
 
@@ -88,7 +100,8 @@ class UserEnrolledCoursesList(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Course.objects.filter(enrollments__user=self.request.user, is_deleted=False)
+        return Course.objects.filter(enrollments__user=self.request.user, is_deleted=False).select_related("created_by").order_by("-created_at")
+
 
 
 
@@ -438,22 +451,34 @@ class LearningProgressView(APIView):
         is_creator = user.role == "Creator"
 
         if is_creator:
-            # Creator Metrics
-            response_data["total_courses_created"] = Course.objects.filter(created_by=user).count()
-            response_data["total_enrollments"] = Enrollment.objects.filter(course__created_by=user).count()
-            response_data["total_revenue"] = Enrollment.objects.filter(course__created_by=user).aggregate(
-                revenue=Sum("course__price")
-            )["revenue"] or 0
+            # Creator Metrics (Filter out deleted courses)
+            response_data["total_courses_created"] = Course.objects.filter(
+                created_by=user, is_deleted=False
+            ).count()
+
+            response_data["total_enrollments"] = Enrollment.objects.filter(
+                course__created_by=user, course__is_deleted=False
+            ).count()
+
+            response_data["total_revenue"] = Enrollment.objects.filter(
+                course__created_by=user, course__is_deleted=False
+            ).aggregate(revenue=Sum("course__price"))["revenue"] or 0
         else:
             # Learner Metrics
-            response_data["total_courses_enrolled"] = Enrollment.objects.filter(user=user).count()
-            response_data["total_courses_completed"] = Certification.objects.filter(user=user, is_verified=True).count()
-            response_data["leaderboard_xp"] = QuizSubmission.objects.filter(user=user).aggregate(
-                total_xp=Sum("score")
-            )["total_xp"] or 0
+            response_data["total_courses_enrolled"] = Enrollment.objects.filter(
+                user=user, course__is_deleted=False
+            ).count()
 
-            # Count completed modules (all quizzes in module submitted)
-            total_modules_completed = Module.objects.annotate(
+            response_data["total_courses_completed"] = Certification.objects.filter(
+                user=user, is_verified=True, course__is_deleted=False
+            ).count()
+
+            response_data["leaderboard_xp"] = QuizSubmission.objects.filter(
+                user=user
+            ).aggregate(total_xp=Sum("score"))["total_xp"] or 0
+
+            # Count completed modules (Filter out deleted courses)
+            total_modules_completed = Module.objects.filter(course__is_deleted=False).annotate(
                 total_quizzes=Count("quizzes"),
                 completed_quizzes=Count("quizzes", filter=Q(quizzes__quizsubmission__user=user))
             ).filter(total_quizzes=F("completed_quizzes")).count()
