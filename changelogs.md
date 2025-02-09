@@ -8,13 +8,15 @@ All notable changes to Illusion Academy will be documented in this file.
 - 
 
 ### Fix
-- added `default` argument in `title` field in `Quiz`
-- fixed `QuizSubmissionView` to return quiz scores and user details in responses
-- fixed `QuizSerializer` and `ModuleSerializer` to return Quiz data in responses
+- 
 
 
 ### Feat
-- 
+- added `cache`, `db_index`, `select_related` to make querying faster, also sorted `LearningProgressView` by adding checker of is_deleted to sort the right values
 
-## [1.0.0] - 06-02-2025
+- added `db_index` to make querying faster
+
+- added pooling for 10 minutes to keep DB connection alive
+
+## [1.0.0] - 09-02-2025
 
