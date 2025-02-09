@@ -249,6 +249,22 @@ class ModuleSerializer(serializers.ModelSerializer):
 
         return instance
 
+class CourseListSerializer(serializers.ModelSerializer):
+    created_by = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Course
+        read_only_fields = ['id', 'created_by', 'created_at', 'updated_at']
+        fields = [
+            'id', 'course_title', 'course_description', 'course_language', 'course_level',
+            'course_banner', 'course_category', 'price', 'certification', 'estimated_duration',
+            'created_by', 'is_deleted', 'created_at', 'updated_at'
+        ]
+    
+    def get_created_by(self, obj):
+        if obj.created_by:
+            return f"{obj.created_by.first_name} {obj.created_by.last_name}"
+        return None
 
 
 class CourseSerializer(serializers.ModelSerializer):
