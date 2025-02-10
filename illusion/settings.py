@@ -73,7 +73,7 @@ INSTALLED_APPS = [
     'setting',
     'jobs',
 
-    'axes',
+
 ]
 
 # django.contrib.sites
@@ -124,7 +124,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
 
-    'axes.middleware.AxesMiddleware',
+
 
 ]
 
@@ -276,9 +276,6 @@ REST_AUTH = {
 }
 
 AUTHENTICATION_BACKENDS = (
-    # AxesStandaloneBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
-    'axes.backends.AxesStandaloneBackend',
-
     'django.contrib.auth.backends.ModelBackend',  # Default
     # 'allauth.account.auth_backends.AuthenticationBackend',  # For social auth
 )
@@ -340,17 +337,7 @@ CLOUDINARY_STORAGE = {
 }
 
 
-AXES_FAILURE_LIMIT = 5
-# AXES_COOLOFF_TIME = 1
-# AXES_LOCKOUT_CALLABLE = "axes.helpers.get_lockout_response"  # Default lockout response
-AXES_RESET_ON_SUCCESS = True  # Reset counter on successful login
-AXES_ONLY_USER_FAILURES = False # Track by IP + username
-AXES_LOCKOUT_AT_FAILURE = True
 
-AXES_FAILURE_EMAIL_RECIPIENTS = config('AXES_FAILURE_EMAIL_RECIPIENTS')  
-AXES_FAILURE_EMAIL_SUBJECT = 'Multiple Failed Login Attempts'
-AXES_FAILURE_EMAIL=True
-AXES_EMAIL_LOCKOUT=True # Sends email when an IP is locked out
 
 
 LOGGING = {
