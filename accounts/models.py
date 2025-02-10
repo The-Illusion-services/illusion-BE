@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group, Permission
 
 import uuid
 
@@ -15,9 +15,12 @@ class User(AbstractUser):
     last_name = models.CharField(max_length=255)
     phone = models.CharField(max_length=15, blank=True)
     email = models.EmailField(unique=True)
-    role = models.CharField(max_length=200, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=200, choices=ROLE_CHOICES, default="Learner")
     password = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)
+     # Avoid clashes with Django's built-in Group and Permission models
+    groups = models.ManyToManyField(Group, related_name="custom_user_groups", blank=True)
+    user_permissions = models.ManyToManyField(Permission, related_name="custom_user_permissions", blank=True)
     
 
     def __str__(self):
