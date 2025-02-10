@@ -37,7 +37,7 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(" ")
 
-SITE_ID = 1
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -65,11 +65,15 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_filters',
 
+
+
     # django app
     'accounts',
     'courses',
     'setting',
-    'jobs'
+    'jobs',
+
+    'axes',
 ]
 
 # django.contrib.sites
@@ -119,6 +123,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'allauth.account.middleware.AccountMiddleware',
+
+    'axes.middleware.AxesMiddleware',
 
 ]
 
@@ -246,10 +252,10 @@ REST_FRAMEWORK = {
     },
 
     'DEFAULT_CACHE_RESPONSE_TIMEOUT': 60 * 1, # cache for 1 minute
-    # 'DEFAULT_RENDERER_CLASSES': (
-    #     'rest_framework.renderers.JSONRenderer',
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
     #     'rest_framework.renderers.BrowsableAPIRenderer',
-    # ),
+    ),
     # 'DEFAULT_PARSER_CLASSES': (
     #     'rest_framework.parsers.JSONParser',
     #     'rest_framework.parsers.FormParser',
@@ -270,6 +276,9 @@ REST_AUTH = {
 }
 
 AUTHENTICATION_BACKENDS = (
+    # AxesStandaloneBackend should be the first backend in the AUTHENTICATION_BACKENDS list.
+    'axes.backends.AxesStandaloneBackend',
+
     'django.contrib.auth.backends.ModelBackend',  # Default
     # 'allauth.account.auth_backends.AuthenticationBackend',  # For social auth
 )
@@ -329,6 +338,20 @@ CLOUDINARY_STORAGE = {
     'API_KEY': config('API_KEY'),
     'API_SECRET': config('API_SECRET')
 }
+
+
+AXES_FAILURE_LIMIT = 5
+# AXES_COOLOFF_TIME = 1
+# AXES_LOCKOUT_CALLABLE = "axes.helpers.get_lockout_response"  # Default lockout response
+AXES_RESET_ON_SUCCESS = True  # Reset counter on successful login
+AXES_ONLY_USER_FAILURES = False # Track by IP + username
+AXES_LOCKOUT_AT_FAILURE = True
+
+AXES_FAILURE_EMAIL_RECIPIENTS = config('AXES_FAILURE_EMAIL_RECIPIENTS')  
+AXES_FAILURE_EMAIL_SUBJECT = 'Multiple Failed Login Attempts'
+AXES_FAILURE_EMAIL=True
+AXES_EMAIL_LOCKOUT=True # Sends email when an IP is locked out
+
 
 LOGGING = {
     'version': 1,
