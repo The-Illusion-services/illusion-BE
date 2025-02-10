@@ -29,12 +29,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(jqbx_r&i@nv7wizsn!a-0av@q*aco@zc@2%*gfi_&74+l)2d8'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+
+ALLOWED_HOSTS = config("ALLOWED_HOSTS").split(" ")
 
 SITE_ID = 1
 # Application definition
@@ -83,7 +84,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none" # Do not require email confirmation
 # Google OAuth
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
-GOOGLE_OAUTH_CALLBACK_URL = os.getenv("GOOGLE_OAUTH_CALLBACK_URL")
+GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL')
 
 # django-allauth (social)
 # Authenticate if local account with this email address already exists
@@ -99,7 +100,7 @@ SOCIALACCOUNT_PROVIDERS = {
                 "key": "",
             },
         ],
-        "SCOPE": ["profile", "contact", "email"],
+        "SCOPE": ["profile", "email"],
         "AUTH_PARAMS": {
             "access_type": "online",
         },
@@ -228,6 +229,7 @@ TOKEN_AUTHENTICATION_CLASS = 'rest_framework_simplejwt.authentication.JWTAuthent
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'dj_rest_auth.jwt_auth.JWTCookieAuthentication',
         # 'rest_framework.authentication.TokenAuthentication',
         # 'accounts.authenticate.CustomAuthentication',
     ],
@@ -260,6 +262,12 @@ REST_FRAMEWORK = {
 }
 
 
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_COOKIE": "_auth",
+    "JWT_AUTH_REFRESH_COOKIE": "_refresh",
+    "JWT_AUTH_HTTPONLY": False,  # Makes sure refresh token is sent
+}
 
 AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',  # Default
