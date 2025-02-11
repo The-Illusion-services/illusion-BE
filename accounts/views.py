@@ -146,9 +146,12 @@ class GoogleLogin(SocialLoginView):
 class GoogleLoginCallback(APIView):
 
     def post(self, request):
+ 
+        print("Received request data:", request.data)  # Debug incoming data
         code = request.data.get("code")
-
+        
         if not code:
+            print("No code found in request")  # Debug missing code
             return Response({"error": "Authorization code is required"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Exchange the authorization code for an access token
@@ -160,7 +163,6 @@ class GoogleLoginCallback(APIView):
             "grant_type": "authorization_code",
         }
 
-        token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
         token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
         print("Token Response Status:", token_response.status_code)
         print("Token Response Data:", token_response.json())  # Debugging log
