@@ -161,6 +161,10 @@ class GoogleLoginCallback(APIView):
         }
 
         token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
+        token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
+        print("Token Response Status:", token_response.status_code)
+        print("Token Response Data:", token_response.json())  # Debugging log
+
 
         if token_response.status_code != 200:
             return Response(
