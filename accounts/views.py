@@ -156,7 +156,7 @@ class GoogleLoginCallback(APIView):
             "code": code,
             "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
             "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-            "redirect_uri": "https://illusion-academy.vercel.app/auth/callback",  # Must match the registered redirect URI
+            "redirect_uri": "http://localhost:5555/auth/callback",  # Must match the registered redirect URI
             "grant_type": "authorization_code",
         }
 
