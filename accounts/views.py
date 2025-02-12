@@ -222,81 +222,83 @@ class GoogleLoginCallback(APIView):
         )
 
 
-#     def get(self, request, *args, **kwargs):
-#         code = request.GET.get("code")
+class GoogleLoginCallback2(APIView):
 
-#         if code is None:
-#             return Response({"error": "Authorization code is missing"}, status=status.HTTP_400_BAD_REQUEST)
+    def get(self, request, *args, **kwargs):
+        code = request.GET.get("code")
 
-#         # Exchange the authorization code for an access token
-#         token_data = {
-#             "code": code,
-#             "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
-#             "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-#             "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,
-#             "grant_type": "authorization_code",
-#         }
+        if code is None:
+            return Response({"error": "Authorization code is missing"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
-#         print("Token Response:", token_response.json())  # Debugging log
+        # Exchange the authorization code for an access token
+        token_data = {
+            "code": code,
+            "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
+            "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
+            "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URL2,
+            "grant_type": "authorization_code",
+        }
 
-#         if token_response.status_code != 200:
-#             return Response(
-#                 {"error": "Failed to exchange token", "details": token_response.json()},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
+        token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
+        print("Token Response:", token_response.json())  # Debugging log
 
-#         access_token = token_response.json().get("access_token")
-#         if not access_token:
-#             return Response({"error": "Access token missing"}, status=status.HTTP_400_BAD_REQUEST)
+        if token_response.status_code != 200:
+            return Response(
+                {"error": "Failed to exchange token", "details": token_response.json()},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-#         # Fetch user details from Google
-#         user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
-#         headers = {"Authorization": f"Bearer {access_token}"}
-#         user_info_response = requests.get(user_info_url, headers=headers)
+        access_token = token_response.json().get("access_token")
+        if not access_token:
+            return Response({"error": "Access token missing"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         print("Google User Info Response:", user_info_response.json())  # Debugging log
+        # Fetch user details from Google
+        user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
+        headers = {"Authorization": f"Bearer {access_token}"}
+        user_info_response = requests.get(user_info_url, headers=headers)
 
-#         if user_info_response.status_code != 200:
-#             return Response(
-#                 {"error": "Failed to fetch user details from Google", "details": user_info_response.json()},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
+        print("Google User Info Response:", user_info_response.json())  # Debugging log
 
-#         user_data = user_info_response.json()
-#         email = user_data.get("email")
-#         first_name = user_data.get("given_name", "")
-#         last_name = user_data.get("family_name", "")
+        if user_info_response.status_code != 200:
+            return Response(
+                {"error": "Failed to fetch user details from Google", "details": user_info_response.json()},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-#         if not email:
-#             return Response({"error": "Email not found in Google response"}, status=status.HTTP_400_BAD_REQUEST)
+        user_data = user_info_response.json()
+        email = user_data.get("email")
+        first_name = user_data.get("given_name", "")
+        last_name = user_data.get("family_name", "")
 
-#         # Check if user exists, if not create a new one
-#         user, created = User.objects.get_or_create(
-#             email=email,
-#             username=email,
-#             defaults={"first_name": first_name, "last_name": last_name, "role": "Learner"},
-#         )
+        if not email:
+            return Response({"error": "Email not found in Google response"}, status=status.HTTP_400_BAD_REQUEST)
 
-#         if not created:
-#             # Update missing fields if necessary
-#             user.first_name = user.first_name or first_name
-#             user.last_name = user.last_name or last_name
-#             user.save()
+        # Check if user exists, if not create a new one
+        user, created = User.objects.get_or_create(
+            email=email,
+            username=email,
+            defaults={"first_name": first_name, "last_name": last_name, "role": "Learner"},
+        )
 
-#         # Generate access and refresh tokens
-#         from rest_framework_simplejwt.tokens import RefreshToken
+        if not created:
+            # Update missing fields if necessary
+            user.first_name = user.first_name or first_name
+            user.last_name = user.last_name or last_name
+            user.save()
 
-#         refresh = RefreshToken.for_user(user)
-#         response_data = {
-#             "access_token": str(refresh.access_token),
-#             "refresh_token": str(refresh),
-#             "user_id": user.id,
-#             "email": user.email,
-#             "role": user.role,
-#         }
+        # Generate access and refresh tokens
+        from rest_framework_simplejwt.tokens import RefreshToken
 
-#         return Response(response_data, status=status.HTTP_200_OK)
+        refresh = RefreshToken.for_user(user)
+        response_data = {
+            "access_token": str(refresh.access_token),
+            "refresh_token": str(refresh),
+            "user_id": user.id,
+            "email": user.email,
+            "role": user.role,
+        }
+
+        return Response(response_data, status=status.HTTP_200_OK)
 
 
 
@@ -308,7 +310,7 @@ class LoginPage(View):
             request,
             "pages/login.html",
             {
-                "google_callback_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,
+                "google_callback_uri": settings.GOOGLE_OAUTH_CALLBACK_URL2,
                 "google_client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
             },
         )

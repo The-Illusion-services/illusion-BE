@@ -21,6 +21,13 @@ urlpatterns = [
         name="google_login_callback",
     ),
 
+        path(
+        "v1/auth/google/callback2/",
+        GoogleLoginCallback2.as_view(),
+        name="google_login_callback2",
+    ),
+
+
 
 
     path('profile/', ProfileView.as_view(), name='profile'),
