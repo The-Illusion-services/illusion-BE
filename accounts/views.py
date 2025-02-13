@@ -30,7 +30,7 @@ from dj_rest_auth.registration.views import SocialLoginView
 from urllib.parse import urljoin
 import requests
 from django.urls import reverse
-
+import os
 
 
 
@@ -143,6 +143,14 @@ class GoogleLogin(SocialLoginView):
     client_class = OAuth2Client
 
 
+
+ENV = os.getenv('ENV', 'development')
+
+GOOGLE_OAUTH_CALLBACK_URL = os.getenv(
+    'GOOGLE_OAUTH_CALLBACK_URL_DEV' if ENV == 'development' else 'GOOGLE_OAUTH_CALLBACK_URL_PROD'
+)
+
+
 class GoogleLoginCallback(APIView):
     permission_classes = [AllowAny]
 
@@ -160,7 +168,7 @@ class GoogleLoginCallback(APIView):
             "code": code,
             "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
             "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-            "redirect_uri": "http://localhost:5555/auth/callback",  # Must match the registered redirect URI
+            "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,  # Must match the registered redirect URI
             "grant_type": "authorization_code",
         }
 
