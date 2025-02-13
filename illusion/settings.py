@@ -88,8 +88,14 @@ ACCOUNT_EMAIL_VERIFICATION = "none" # Do not require email confirmation
 # Google OAuth
 GOOGLE_OAUTH_CLIENT_ID = os.getenv("GOOGLE_OAUTH_CLIENT_ID")
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv("GOOGLE_OAUTH_CLIENT_SECRET")
-GOOGLE_OAUTH_CALLBACK_URL = os.getenv('GOOGLE_OAUTH_CALLBACK_URL')
-GOOGLE_OAUTH_CALLBACK_URL2 = os.getenv('GOOGLE_OAUTH_CALLBACK_URL2')
+ENV = os.getenv('ENV', 'development')
+
+GOOGLE_OAUTH_CALLBACK_URL = os.getenv(
+    'GOOGLE_OAUTH_CALLBACK_URL_DEV' if ENV == 'development' else 'GOOGLE_OAUTH_CALLBACK_URL_PROD'
+)
+
+
+
 # django-allauth (social)
 # Authenticate if local account with this email address already exists
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
