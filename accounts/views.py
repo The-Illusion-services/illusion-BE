@@ -49,7 +49,7 @@ class UserRegistrationView(APIView):
                 'email': openapi.Schema(type=openapi.TYPE_STRING, description='Email'),
                 'password': openapi.Schema(type=openapi.TYPE_STRING, description='Password'),
                 'confirm_password': openapi.Schema(type=openapi.TYPE_STRING, description='Confirm Password'),
-                'role': openapi.Schema(type=openapi.TYPE_STRING, enum=['Employee', 'Employer'], description='Role'),
+                'role': openapi.Schema(type=openapi.TYPE_STRING, enum=['Learner', 'Creator'], description='Role'),
             },
             required=['first_name', 'last_name', 'email', 'password', 'confirm_password', 'role'],
         ),
@@ -68,7 +68,7 @@ class UserRegistrationView(APIView):
             'last_name': data['last_name'],
             'email': data['email'],
             'password': data['password'],
-            'role': data['role']
+            'role': 'Creator'
         })
 
         # Validate and save user
@@ -222,75 +222,6 @@ class GoogleLoginCallback(APIView):
             status=status.HTTP_200_OK,
         )
 
-
-class GoogleLoginCallback2(APIView):
-    def get(self, request, *args, **kwargs):
-        code = request.GET.get("code")
-
-        if code is None:
-            return Response({"error": "Authorization code is missing"}, status=status.HTTP_400_BAD_REQUEST)
-
-        token_data = {
-            "code": code,
-            "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
-            "client_secret": settings.GOOGLE_OAUTH_CLIENT_SECRET,
-            "redirect_uri": settings.GOOGLE_OAUTH_CALLBACK_URL2,
-            "grant_type": "authorization_code",
-        }
-
-        token_response = requests.post("https://oauth2.googleapis.com/token", data=token_data)
-
-        if token_response.status_code != 200:
-            return Response(
-                {"error": "Failed to exchange token", "details": token_response.json()},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        access_token = token_response.json().get("access_token")
-        user_info_url = "https://www.googleapis.com/oauth2/v2/userinfo"
-        headers = {"Authorization": f"Bearer {access_token}"}
-        user_info_response = requests.get(user_info_url, headers=headers)
-
-        if user_info_response.status_code != 200:
-            return Response(
-                {"error": "Failed to fetch user details", "details": user_info_response.json()},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        user_data = user_info_response.json()
-        email = user_data.get("email")
-        first_name = user_data.get("given_name", "")
-        last_name = user_data.get("family_name", "")
-
-        if not email:
-            return Response({"error": "Email not found"}, status=status.HTTP_400_BAD_REQUEST)
-
-        user, created = User.objects.get_or_create(
-            email=email,
-            username=email,
-            defaults={"first_name": first_name, "last_name": last_name, "role": "Learner"},
-        )
-
-        refresh = RefreshToken.for_user(user)
-
-        # Set HttpOnly cookies with tokens (better security)
-        response = redirect("https://yourfrontend.com/dashboard")  # Or some frontend page after login
-        response.set_cookie(
-            key="access_token",
-            value=str(refresh.access_token),
-            httponly=True,
-            secure=True,  # Use in production (https)
-            samesite="Lax",
-        )
-        response.set_cookie(
-            key="refresh_token",
-            value=str(refresh),
-            httponly=True,
-            secure=True,
-            samesite="Lax",
-        )
-
-        return response
 
 
 # for testing the oauth flow
