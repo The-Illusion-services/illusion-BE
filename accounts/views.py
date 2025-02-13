@@ -144,13 +144,6 @@ class GoogleLogin(SocialLoginView):
 
 
 
-ENV = os.getenv('ENV', 'development')
-
-GOOGLE_OAUTH_CALLBACK_URL = os.getenv(
-    'GOOGLE_OAUTH_CALLBACK_URL_DEV' if ENV == 'development' else 'GOOGLE_OAUTH_CALLBACK_URL_PROD'
-)
-
-
 class GoogleLoginCallback(APIView):
     permission_classes = [AllowAny]
 
@@ -239,7 +232,7 @@ class LoginPage(View):
             request,
             "pages/login.html",
             {
-                "google_callback_uri": settings.GOOGLE_OAUTH_CALLBACK_URL2,
+                "google_callback_uri": settings.GOOGLE_OAUTH_CALLBACK_URL,
                 "google_client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
             },
         )
