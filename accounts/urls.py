@@ -15,17 +15,7 @@ urlpatterns = [
     path("glogin/", LoginPage.as_view(), name="login"),
     
     path("v1/auth/google/", GoogleLogin.as_view(), name="google_login"),
-    path(
-        "v1/auth/google/callback/",
-        GoogleLoginCallback.as_view(),
-        name="google_login_callback",
-    ),
 
-        path(
-        "v1/auth/google/callback2/",
-        GoogleLoginCallback2.as_view(),
-        name="google_login_callback2",
-    ),
 
 
 
